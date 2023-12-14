@@ -1,14 +1,15 @@
 #!/bin/bash
 
-EXE=${1:-"main"}
-SRC="${EXE}.rs"
+echo "Monitoring src for changes..."
 
-echo "Monitoring ${SRC} for changes..."
-
-while ! inotifywait -e close_write,modify "${SRC}"; do
-  rustc ${SRC}
-  clear
-  echo "= Build done; Running ==============================="; echo
-  ./${EXE}
-  echo; echo "= $(date) ==================="
+inotifywait -q -m -r -e modify src | while read DIRECTORY EVENT FILE; do
+  # echo $DIRECTORY $EVENT $FILE
+  case $EVENT in
+    MODIFY*)
+      clear
+      echo "= Cargo run ==============================="; echo
+      cargo build && cargo run -q
+      echo; echo "= $(date) ==================="
+      ;;
+  esac
 done
