@@ -1,4 +1,4 @@
-use crate::token::{Token, TokenType};
+use crate::token::Token;
 
 struct Lexer {
     input: String,
@@ -32,37 +32,21 @@ impl Lexer {
 
     fn next_token(&mut self) -> Token {
         let tok: Token = match self.ch {
-            b'=' => new_token(TokenType::Assign, self.ch.to_string()),
-            b';' => new_token(TokenType::Semicolon, self.ch.to_string()),
-            b'(' => new_token(TokenType::LParen, self.ch.to_string()),
-            b')' => new_token(TokenType::RParen, self.ch.to_string()),
-            b',' => new_token(TokenType::Comma, self.ch.to_string()),
-            b'+' => new_token(TokenType::Plus, self.ch.to_string()),
-            b'{' => new_token(TokenType::LBrace, self.ch.to_string()),
-            b'}' => new_token(TokenType::RBrace, self.ch.to_string()),
-            0 => new_token(TokenType::EOF, self.ch.to_string()),
-            _ => new_token(TokenType::Illegal, self.ch.to_string()),
+            b'=' => Token::Assign(self.ch.to_string()),
+            b';' => Token::Semicolon(self.ch.to_string()),
+            b'(' => Token::LParen(self.ch.to_string()),
+            b')' => Token::RParen(self.ch.to_string()),
+            b',' => Token::Comma(self.ch.to_string()),
+            b'+' => Token::Plus(self.ch.to_string()),
+            b'{' => Token::LBrace(self.ch.to_string()),
+            b'}' => Token::RBrace(self.ch.to_string()),
+            0 => Token::EOF(self.ch.to_string()),
+            _ => Token::Illegal(self.ch.to_string()),
         };
         self.read_char();
         tok
     }
 }
 
-pub fn new_token(token_type: TokenType, literal: String) -> Token {
-    Token {
-        token_type,
-        literal,
-    }
-}
-
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new_token() {
-        let tok = new_token(TokenType::Ident, "foobar".to_string());
-        assert_eq!(tok.token_type, TokenType::Ident);
-        assert_eq!(tok.literal, "foobar".to_string());
-    }
-}
+mod tests {}

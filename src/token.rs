@@ -1,32 +1,27 @@
 // Token definitions for the Monkey language.
 #[derive(PartialEq, Debug)]
-pub enum TokenType {
+pub enum Token {
     // Special tokens
-    Illegal,
-    EOF,
+    Illegal(String),
+    EOF(String),
 
     // Identifiers + literals
-    Ident,
-    Int,
+    Ident(String),
+    Int(String),
 
     // Operators
-    Assign,
-    Plus,
+    Assign(String),
+    Plus(String),
 
     // Delimiters
-    Comma,
-    Semicolon,
-    LParen,
-    RParen,
-    LBrace,
-    RBrace,
+    Comma(String),
+    Semicolon(String),
+    LParen(String),
+    RParen(String),
+    LBrace(String),
+    RBrace(String),
 
     // Keywords
-    Function,
-    Let,
-}
-
-pub struct Token {
-    pub token_type: TokenType,
-    pub literal: String,
+    Function(String),
+    Let(String),
 }
