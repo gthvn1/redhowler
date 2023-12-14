@@ -1,14 +1,32 @@
-#[allow(dead_code)]
-pub fn get_token() -> u32 {
-    42
+// Token definitions for the Monkey language.
+#[derive(PartialEq, Debug)]
+pub enum TokenType {
+    // Special tokens
+    Illegal,
+    EOF,
+
+    // Identifiers + literals
+    Ident,
+    Int,
+
+    // Operators
+    Assign,
+    Plus,
+
+    // Delimiters
+    Comma,
+    Semicolon,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
+
+    // Keywords
+    Function,
+    Let,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_get_token() {
-        assert_eq!(get_token(), 42);
-    }
+pub struct Token {
+    pub token_type: TokenType,
+    pub literal: String,
 }
