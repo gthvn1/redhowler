@@ -1,5 +1,15 @@
 # Redhowler
  
- A South American species of howler monkey
+In honour of the South American species *howler monkey*...
 
-A monkey interpreter written in Rust...
+It will be our monkey interpreter written in Rust... 
+In this moment of ourselvesdaring venture, we stand at the threshold of 
+exploration's infancy. 
+
+Merely acquainting ourselves with the rudimentary foundations, we have
+laid the groundwork, establishing the bare essentials required for the 
+construction of our code, the famous **"Hello, Monkey Islang!"**. 
+
+With bated breath and vigilant eyes, we observe in real-time the unfolding 
+spectacle, seeking insight into the enigmatic tapestry of events that transpire
+before us...
