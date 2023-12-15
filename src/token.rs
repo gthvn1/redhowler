@@ -25,3 +25,13 @@ pub enum Token {
     Function(String),
     Let(String),
 }
+
+impl Token {
+    pub fn lookup_ident(ident: &str) -> Token {
+        match ident {
+            "fn" => Token::Function(String::from(ident)),
+            "let" => Token::Let(String::from(ident)),
+            _ => Token::Ident(String::from(ident)),
+        }
+    }
+}
