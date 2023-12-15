@@ -1,26 +1,28 @@
 use crate::token::Token;
 
-struct Lexer {
-    input: String,
-    position: usize,      // current position in input (points to current char)
-    read_position: usize, // current reading position in input (after current char)
-    ch: char,             // current char under examination
+pub struct Lexer<'a> {
+    input: &'a str,
+    position: usize,      // Current position in input (points to current char).
+    read_position: usize, // Current reading position in input (after current char).
+    ch: char,             // Current char under examination.
 }
 
-impl Lexer {
-    #![allow(dead_code)]
-    fn new(input: String) -> Lexer {
+impl<'a> Lexer<'a> {
+    pub fn new(input: &'a str) -> Lexer {
         let mut l = Lexer {
             input,
             position: 0,
             read_position: 0,
             ch: 0 as char,
         };
+
+        // Initialize the lexer by reading the first character before
+        // returing.
         l.read_char();
         l
     }
 
-    fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Token {
         self.skip_whitespace();
 
         let tok: Token = match self.ch {
@@ -154,7 +156,7 @@ mod tests {
     }
 
     #[test]
-    fn test_next_token() {
+    pub fn test_next_token() {
         let input = String::from("=+(){},;");
         let tests = vec![
             Token::Assign('='.to_string()),
@@ -168,7 +170,7 @@ mod tests {
             Token::EOF(String::from("\0")),
         ];
 
-        let mut l = Lexer::new(input);
+        let mut l = Lexer::new(&input);
         for tt in tests {
             let tok = l.next_token();
             assert_eq!(tok, tt);
@@ -277,7 +279,7 @@ mod tests {
             Token::EOF(String::from("\0")),
         ];
 
-        let mut l = Lexer::new(input);
+        let mut l = Lexer::new(&input);
         for tt in tests {
             let tok = l.next_token();
             assert_eq!(tok, tt);

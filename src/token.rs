@@ -42,6 +42,7 @@ pub enum Token {
 }
 
 impl Token {
+    // Keep our own copy of the keywords.
     pub fn lookup_ident(ident: &str) -> Token {
         match ident {
             "fn" => Token::Function(String::from(ident)),

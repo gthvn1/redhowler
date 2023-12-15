@@ -1,12 +1,11 @@
 mod lexer;
+mod repl;
 mod token;
 
 fn main() {
-    println!("Hello, Monkey Islang!");
-    let mut s = String::new();
-    const C: char = '=';
-    const B: char = '=';
-    s.push(C);
-    s.push(B);
-    println!("{}", s)
+    println!("Welcome to Monkey Islang!!!");
+    println!("This is the REPL for Monkey programming language.");
+    println!("Feel free to type commands or quit();");
+
+    repl::start();
 }
