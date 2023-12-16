@@ -1,76 +1,54 @@
 // Token definitions for the Monkey language.
-#[derive(PartialEq, Debug)]
-pub enum Token {
+#[derive(PartialEq, Debug, Clone)]
+pub enum TokenType {
     // Special tokens
-    Illegal(String),
-    EOF(String),
+    Illegal,
+    EOF,
 
     // Identifiers + literals
-    Ident(String),
-    Int(String),
+    Ident,
+    Int,
 
     // One character operators
-    Assign(String),
-    Plus(String),
-    Minus(String),
-    Bang(String),
-    Asterisk(String),
-    Slash(String),
-    LT(String),
-    GT(String),
+    Assign,
+    Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+    LT,
+    GT,
 
     // Two characters operators
-    Equal(String),    // ==
-    NotEqual(String), // !=
+    Equal,    // ==
+    NotEqual, // !=
 
     // Delimiters
-    Comma(String),
-    Semicolon(String),
-    LParen(String),
-    RParen(String),
-    LBrace(String),
-    RBrace(String),
+    Comma,
+    Semicolon,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
 
     // Keywords
-    Function(String),
-    Let(String),
-    True(String),
-    False(String),
-    If(String),
-    Else(String),
-    Return(String),
+    Function,
+    Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub literal: String,
 }
 
 impl Token {
     pub fn literal(&self) -> String {
-        match self {
-            Token::Illegal(literal) => literal.clone(),
-            Token::EOF(literal) => literal.clone(),
-            Token::Ident(literal) => literal.clone(),
-            Token::Int(literal) => literal.clone(),
-            Token::Assign(literal) => literal.clone(),
-            Token::Plus(literal) => literal.clone(),
-            Token::Minus(literal) => literal.clone(),
-            Token::Bang(literal) => literal.clone(),
-            Token::Asterisk(literal) => literal.clone(),
-            Token::Slash(literal) => literal.clone(),
-            Token::LT(literal) => literal.clone(),
-            Token::GT(literal) => literal.clone(),
-            Token::Equal(literal) => literal.clone(),
-            Token::NotEqual(literal) => literal.clone(),
-            Token::Comma(literal) => literal.clone(),
-            Token::Semicolon(literal) => literal.clone(),
-            Token::LParen(literal) => literal.clone(),
-            Token::RParen(literal) => literal.clone(),
-            Token::LBrace(literal) => literal.clone(),
-            Token::RBrace(literal) => literal.clone(),
-            Token::Function(literal) => literal.clone(),
-            Token::Let(literal) => literal.clone(),
-            Token::True(literal) => literal.clone(),
-            Token::False(literal) => literal.clone(),
-            Token::If(literal) => literal.clone(),
-            Token::Else(literal) => literal.clone(),
-            Token::Return(literal) => literal.clone(),
-        }
+        self.literal.clone()
     }
 }
