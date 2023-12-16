@@ -42,17 +42,35 @@ pub enum Token {
 }
 
 impl Token {
-    // Keep our own copy of the keywords.
-    pub fn lookup_ident(ident: &str) -> Token {
-        match ident {
-            "fn" => Token::Function(String::from(ident)),
-            "let" => Token::Let(String::from(ident)),
-            "true" => Token::True(String::from(ident)),
-            "false" => Token::False(String::from(ident)),
-            "if" => Token::If(String::from(ident)),
-            "else" => Token::Else(String::from(ident)),
-            "return" => Token::Return(String::from(ident)),
-            _ => Token::Ident(String::from(ident)),
+    pub fn literal(&self) -> String {
+        match self {
+            Token::Illegal(literal) => literal.clone(),
+            Token::EOF(literal) => literal.clone(),
+            Token::Ident(literal) => literal.clone(),
+            Token::Int(literal) => literal.clone(),
+            Token::Assign(literal) => literal.clone(),
+            Token::Plus(literal) => literal.clone(),
+            Token::Minus(literal) => literal.clone(),
+            Token::Bang(literal) => literal.clone(),
+            Token::Asterisk(literal) => literal.clone(),
+            Token::Slash(literal) => literal.clone(),
+            Token::LT(literal) => literal.clone(),
+            Token::GT(literal) => literal.clone(),
+            Token::Equal(literal) => literal.clone(),
+            Token::NotEqual(literal) => literal.clone(),
+            Token::Comma(literal) => literal.clone(),
+            Token::Semicolon(literal) => literal.clone(),
+            Token::LParen(literal) => literal.clone(),
+            Token::RParen(literal) => literal.clone(),
+            Token::LBrace(literal) => literal.clone(),
+            Token::RBrace(literal) => literal.clone(),
+            Token::Function(literal) => literal.clone(),
+            Token::Let(literal) => literal.clone(),
+            Token::True(literal) => literal.clone(),
+            Token::False(literal) => literal.clone(),
+            Token::If(literal) => literal.clone(),
+            Token::Else(literal) => literal.clone(),
+            Token::Return(literal) => literal.clone(),
         }
     }
 }

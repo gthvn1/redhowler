@@ -72,7 +72,17 @@ impl<'a> Lexer<'a> {
                     // read_identifier() returns a slice of the input string
                     // We return directly because we already did the self.read_char()
                     // so we don't want to do another one.
-                    return Token::lookup_ident(self.read_identifier());
+                    let ident = self.read_identifier();
+                    return match ident {
+                        "fn" => Token::Function(String::from(ident)),
+                        "let" => Token::Let(String::from(ident)),
+                        "true" => Token::True(String::from(ident)),
+                        "false" => Token::False(String::from(ident)),
+                        "if" => Token::If(String::from(ident)),
+                        "else" => Token::Else(String::from(ident)),
+                        "return" => Token::Return(String::from(ident)),
+                        _ => Token::Ident(String::from(ident)),
+                    };
                 }
 
                 if self.ch.is_digit(10) {
