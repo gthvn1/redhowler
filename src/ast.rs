@@ -1,5 +1,6 @@
 // AST is Nodes connected each other.
 use crate::token::Token;
+use std::any::Any;
 
 // Every node in our AST has to implement the Node trait.
 pub trait Node {
@@ -10,7 +11,8 @@ pub trait Node {
 // Statement does not produce value.
 pub trait Statement: Node {
     // This dummy method is used for debugging.
-    fn statement_node(&self) {}
+    fn statement_node(&self);
+    fn as_any(&self) -> &dyn Any;
 }
 
 // Expression produces value.
@@ -108,6 +110,16 @@ impl Node for LetStatement {
 
 impl Statement for LetStatement {
     fn statement_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+#[allow(dead_code)]
+impl LetStatement {
+    pub fn name(&self) -> &str {
+        self.name.value.as_str()
+    }
 }
 
 // ============================================================================

@@ -3,7 +3,7 @@
 // in the process.
 // We are constructing a recursive descent parser, which is a type of top-down
 // parsing.
-use crate::ast::{self, Node};
+use crate::ast::{self};
 use crate::lexer::Lexer;
 use crate::token::{Token, TokenType};
 
@@ -14,9 +14,12 @@ struct Parser<'l> {
     peek_token: Token,
 }
 
+// TODO: As we have the same lifetime as lexer maybe we can use a reference to
+// Token instead of creating a new one and so creating new string. But maybe it is
+// completely ok.
 #[allow(dead_code)]
 impl<'l> Parser<'l> {
-    fn new(lexer: Lexer<'l>) -> Self {
+    pub fn new(lexer: Lexer<'l>) -> Self {
         let mut p = Parser {
             lexer,
             cur_token: Token {
@@ -29,18 +32,15 @@ impl<'l> Parser<'l> {
             },
         };
 
-        // Read two tokens, so cur_token and peek_token are both set.
+        // Read two tokens, so cur_token and peek_token will be both set.
         p.next_token();
         p.next_token();
         p
     }
 
-    fn next_token(&mut self) {
-        self.cur_token = self.peek_token.clone();
-        self.peek_token = self.lexer.next_token();
-    }
-
-    fn parse_program(&mut self) -> ast::Program {
+    // This is the entry point for parsing a program.
+    // We keep parsing statements until we reach the end of the input.
+    pub fn parse_program(&mut self) -> ast::Program {
         let mut program = ast::Program::new();
 
         while self.cur_token.token_type != TokenType::EOF {
@@ -53,6 +53,10 @@ impl<'l> Parser<'l> {
         program
     }
 
+    // This is the entry point for parsing a statement.
+    // In the current implementation we only support let statements. So if the token
+    // matches let we parse a let statement, otherwise we return None.
+    // TODO: support others statements like return.
     fn parse_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         match self.cur_token.token_type {
             TokenType::Let => {
@@ -63,6 +67,14 @@ impl<'l> Parser<'l> {
         }
     }
 
+    // This is the entry point for parsing a let statement.
+    // Let statement is of the form: let <identifier> = <expression>;
+    // So we expect:
+    // - let token
+    // - identifier token
+    // - assign token
+    // - expression (TODO: parse expression, currently we skip it)
+    // - semicolon token
     fn parse_let_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         let mut stmt_builder = ast::LetStatementBuilder::new(&self.cur_token);
 
@@ -84,20 +96,27 @@ impl<'l> Parser<'l> {
         }
 
         let stmt = stmt_builder.build();
-        eprintln!("Let statement: {}", stmt.token_literal());
         Some(Box::new(stmt))
     }
 
+    // Advance the lexer by one token and update the current and peek tokens.
+    fn next_token(&mut self) {
+        self.cur_token = self.peek_token.clone();
+        self.peek_token = self.lexer.next_token();
+    }
+
+    // Check if the current token is of the expected type.
     fn cur_token_is(&self, token_type: TokenType) -> bool {
         self.cur_token.token_type == token_type
     }
 
+    // Check if the next token is of the expected type.
     fn peek_token_is(&self, token_type: TokenType) -> bool {
         self.peek_token.token_type == token_type
     }
 
-    // If the next token is of expected type then we advance to next token
-    // and return true, otherwise we return false.
+    // If the next token is the expected one then we advance to next token
+    // and return true, otherwise we don't read the next token and return false.
     fn expect_peek(&mut self, token_type: TokenType) -> bool {
         if self.peek_token_is(token_type) {
             self.next_token();
@@ -110,6 +129,8 @@ impl<'l> Parser<'l> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::LetStatement;
+
     use super::*;
 
     #[test]
@@ -130,5 +151,19 @@ mod tests {
         });
 
         assert_eq!(program.statements.len(), 3);
+
+        let expected_identifiers = vec!["x", "y", "foobar"];
+        program
+            .statements
+            .iter()
+            .zip(expected_identifiers.iter())
+            .for_each(|(stmt, expected_ident)| {
+                assert_eq!(stmt.token_literal(), "let");
+                if let Some(let_stmt) = stmt.as_any().downcast_ref::<LetStatement>() {
+                    assert_eq!(let_stmt.name(), *expected_ident);
+                } else {
+                    panic!("Expected LetStatement");
+                }
+            });
     }
 }
