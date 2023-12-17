@@ -12,6 +12,7 @@ struct Parser<'l> {
     lexer: Lexer<'l>,
     cur_token: Token,
     peek_token: Token,
+    errors: Vec<String>,
 }
 
 // TODO: As we have the same lifetime as lexer maybe we can use a reference to
@@ -30,6 +31,7 @@ impl<'l> Parser<'l> {
                 token_type: TokenType::Illegal,
                 literal: String::from("Dummy"),
             },
+            errors: Vec::new(),
         };
 
         // Read two tokens, so cur_token and peek_token will be both set.
@@ -59,10 +61,7 @@ impl<'l> Parser<'l> {
     // TODO: support others statements like return.
     fn parse_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         match self.cur_token.token_type {
-            TokenType::Let => {
-                eprintln!("Parsing let statement");
-                self.parse_let_statement()
-            }
+            TokenType::Let => self.parse_let_statement(),
             _ => None,
         }
     }
@@ -78,20 +77,18 @@ impl<'l> Parser<'l> {
     fn parse_let_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         let mut stmt_builder = ast::LetStatementBuilder::new(&self.cur_token);
 
-        if !self.expect_peek(TokenType::Ident) {
-            eprintln!("Expected identifier, got {}", self.peek_token.literal());
+        if !self.expect_peek(&TokenType::Ident) {
             return None;
         }
 
         stmt_builder.name(ast::Identifier::new(&self.cur_token));
 
-        if !self.expect_peek(TokenType::Assign) {
-            eprintln!("Expected assign, got {}", self.peek_token.literal());
+        if !self.expect_peek(&TokenType::Assign) {
             return None;
         }
 
         // TODO: We're skipping the expressions until we encounter a semicolon.
-        while !self.cur_token_is(TokenType::Semicolon) {
+        while !self.cur_token_is(&TokenType::Semicolon) {
             self.next_token();
         }
 
@@ -106,24 +103,33 @@ impl<'l> Parser<'l> {
     }
 
     // Check if the current token is of the expected type.
-    fn cur_token_is(&self, token_type: TokenType) -> bool {
-        self.cur_token.token_type == token_type
+    fn cur_token_is(&self, token_type: &TokenType) -> bool {
+        self.cur_token.token_type == *token_type
     }
 
     // Check if the next token is of the expected type.
-    fn peek_token_is(&self, token_type: TokenType) -> bool {
-        self.peek_token.token_type == token_type
+    fn peek_token_is(&self, token_type: &TokenType) -> bool {
+        self.peek_token.token_type == *token_type
     }
 
     // If the next token is the expected one then we advance to next token
     // and return true, otherwise we don't read the next token and return false.
-    fn expect_peek(&mut self, token_type: TokenType) -> bool {
+    fn expect_peek(&mut self, token_type: &TokenType) -> bool {
         if self.peek_token_is(token_type) {
             self.next_token();
             true
         } else {
+            self.peek_error(token_type);
             false
         }
+    }
+
+    fn peek_error(&mut self, token_type: &TokenType) {
+        let msg = format!(
+            "Expected next token to be {:?}, got {:?} instead",
+            *token_type, self.peek_token.token_type
+        );
+        self.errors.push(msg);
     }
 }
 
@@ -146,9 +152,10 @@ mod tests {
 
         let program = p.parse_program();
 
-        program.statements.iter().for_each(|stmt| {
-            eprintln!("{}", stmt.token_literal());
-        });
+        // Check that parser didn't encounter any errors but before print them
+        // if any.
+        p.errors.iter().for_each(|e| eprintln!("{}", e));
+        assert!(p.errors.is_empty());
 
         assert_eq!(program.statements.len(), 3);
 
