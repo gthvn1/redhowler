@@ -11,7 +11,7 @@ pub fn start() {
             .read_line(&mut input)
             .expect("Failed to read line");
 
-        if input.trim() == "quit();" {
+        if input.trim() == "q;" {
             io::stdout()
                 .write_all(
                     b"May your trip be as enjoyable as finding \

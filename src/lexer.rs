@@ -25,8 +25,6 @@ impl<'a> Lexer<'a> {
     pub fn next_token(&mut self) -> Token {
         self.skip_whitespace();
 
-        println!("next_token ch: {}", self.ch);
-
         let token = self.ch;
         let mut literal = token.to_string();
         let token_type = match token {
