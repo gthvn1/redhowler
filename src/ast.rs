@@ -2,17 +2,17 @@
 use crate::token::Token;
 
 // Every node in our AST has to implement the Node trait.
-trait Node {
+pub trait Node {
     // Returns the literal value of the token.
     fn token_literal(&self) -> String;
 }
 
-trait Statement: Node {
+pub trait Statement: Node {
     // This dummy method is used for debugging.
     fn statement_node(&self) {}
 }
 
-trait Expression: Node {
+pub trait Expression: Node {
     // This dummy method is used for debugging.
     fn expression_node(&self) {}
 }
