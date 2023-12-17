@@ -62,6 +62,7 @@ impl<'l> Parser<'l> {
     fn parse_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         match self.cur_token.token_type {
             TokenType::Let => self.parse_let_statement(),
+            TokenType::Return => self.parse_return_statement(),
             _ => None,
         }
     }
@@ -93,6 +94,24 @@ impl<'l> Parser<'l> {
         }
 
         let stmt = stmt_builder.build();
+        Some(Box::new(stmt))
+    }
+
+    // This is the entry point for parsing a return statement.
+    // Return statement is of the form: return <expression>;
+    fn parse_return_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
+        // TODO: add builder. Currently we are skipping the expression.
+        let stmt = ast::ReturnStatement {
+            token: self.cur_token.clone(),
+        };
+
+        self.next_token();
+
+        // TODO: We're skipping the expressions until we encounter a semicolon.
+        while !self.cur_token_is(&TokenType::Semicolon) {
+            self.next_token();
+        }
+
         Some(Box::new(stmt))
     }
 
@@ -138,6 +157,27 @@ mod tests {
     use crate::ast::LetStatement;
 
     use super::*;
+
+    #[test]
+    fn test_return_statements() {
+        let input = "
+            return 5;
+            return 10;
+            return 993322;
+        ";
+
+        let l = Lexer::new(input);
+        let mut p = Parser::new(l);
+
+        let program = p.parse_program();
+
+        // Check that parser didn't encounter any errors but before print them
+        // if any.
+        p.errors.iter().for_each(|e| eprintln!("{}", e));
+        assert!(p.errors.is_empty());
+
+        assert_eq!(program.statements.len(), 3);
+    }
 
     #[test]
     fn test_let_statements() {

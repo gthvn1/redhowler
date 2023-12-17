@@ -123,6 +123,28 @@ impl LetStatement {
 }
 
 // ============================================================================
+// RETURN STATEMENT
+// ============================================================================
+#[allow(dead_code)]
+pub struct ReturnStatement {
+    pub token: Token, // The token.RETURN token.
+                      //pub return_value: Box<dyn Expression>, // TODO: Implement Expression.
+}
+
+impl Node for ReturnStatement {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+}
+
+impl Statement for ReturnStatement {
+    fn statement_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+// ============================================================================
 // IDENTIFIER
 // ============================================================================
 // Identifier is a node that holds the name of the variable.
