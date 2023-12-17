@@ -1,58 +1,54 @@
 // Token definitions for the Monkey language.
-#[derive(PartialEq, Debug)]
-pub enum Token {
+#[derive(PartialEq, Debug, Clone)]
+pub enum TokenType {
     // Special tokens
-    Illegal(String),
-    EOF(String),
+    Illegal,
+    EOF,
 
     // Identifiers + literals
-    Ident(String),
-    Int(String),
+    Ident,
+    Int,
 
     // One character operators
-    Assign(String),
-    Plus(String),
-    Minus(String),
-    Bang(String),
-    Asterisk(String),
-    Slash(String),
-    LT(String),
-    GT(String),
+    Assign,
+    Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+    LT,
+    GT,
 
     // Two characters operators
-    Equal(String),    // ==
-    NotEqual(String), // !=
+    Equal,    // ==
+    NotEqual, // !=
 
     // Delimiters
-    Comma(String),
-    Semicolon(String),
-    LParen(String),
-    RParen(String),
-    LBrace(String),
-    RBrace(String),
+    Comma,
+    Semicolon,
+    LParen,
+    RParen,
+    LBrace,
+    RBrace,
 
     // Keywords
-    Function(String),
-    Let(String),
-    True(String),
-    False(String),
-    If(String),
-    Else(String),
-    Return(String),
+    Function,
+    Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub literal: String,
 }
 
 impl Token {
-    // Keep our own copy of the keywords.
-    pub fn lookup_ident(ident: &str) -> Token {
-        match ident {
-            "fn" => Token::Function(String::from(ident)),
-            "let" => Token::Let(String::from(ident)),
-            "true" => Token::True(String::from(ident)),
-            "false" => Token::False(String::from(ident)),
-            "if" => Token::If(String::from(ident)),
-            "else" => Token::Else(String::from(ident)),
-            "return" => Token::Return(String::from(ident)),
-            _ => Token::Ident(String::from(ident)),
-        }
+    pub fn literal(&self) -> String {
+        self.literal.clone()
     }
 }

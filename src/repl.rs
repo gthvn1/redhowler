@@ -1,5 +1,5 @@
 use crate::lexer::Lexer;
-use crate::token::Token;
+use crate::token::TokenType;
 use std::io::{self, Write};
 
 pub fn start() {
@@ -11,7 +11,7 @@ pub fn start() {
             .read_line(&mut input)
             .expect("Failed to read line");
 
-        if input.trim() == "quit();" {
+        if input.trim() == "q;" {
             io::stdout()
                 .write_all(
                     b"May your trip be as enjoyable as finding \
@@ -24,7 +24,7 @@ pub fn start() {
         let mut l = Lexer::new(&input);
         loop {
             let tok = l.next_token();
-            if tok == Token::EOF(String::from("\0")) {
+            if tok.token_type == TokenType::EOF {
                 break;
             }
             println!("{:?}", tok);
