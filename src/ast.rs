@@ -6,6 +6,8 @@ use std::any::Any;
 pub trait Node {
     // Returns the literal value of the token.
     fn token_literal(&self) -> String;
+    // print AST nodes for debugging and to compare them with other AST nodes.
+    fn string(&self) -> String;
 }
 
 // Statement does not produce value.
@@ -55,6 +57,14 @@ impl Program {
             String::from("")
         }
     }
+
+    pub fn string(&self) -> String {
+        let mut out = String::new();
+        for stmt in &self.statements {
+            out.push_str(&stmt.string());
+        }
+        out
+    }
 }
 
 // ============================================================================
@@ -100,11 +110,25 @@ impl LetStatementBuilder {
 pub struct LetStatement {
     token: Token, // The token.LET token.
     name: Identifier,
+    //value: Box<dyn Expression>, // TODO: Implement Expression.
 }
 
 impl Node for LetStatement {
     fn token_literal(&self) -> String {
         self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+        out.push_str(&self.token_literal());
+        out.push_str(" ");
+        out.push_str(&self.name.value);
+        out.push_str(" = ");
+        // TODO: Add expresionn when implemented
+        //out.push_str(&self.value.string());
+        out.push_str("<expression will go here>");
+        out.push_str(";");
+        out
     }
 }
 
@@ -135,6 +159,16 @@ impl Node for ReturnStatement {
     fn token_literal(&self) -> String {
         self.token.literal()
     }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+        out.push_str(&self.token_literal());
+        out.push_str(" ");
+        // TODO: Add expresionn when implemented
+        out.push_str("<return value will go here>");
+        out.push_str(";");
+        out
+    }
 }
 
 impl Statement for ReturnStatement {
@@ -158,7 +192,12 @@ impl Node for Identifier {
     fn token_literal(&self) -> String {
         self.token.literal()
     }
+
+    fn string(&self) -> String {
+        self.value.clone()
+    }
 }
+
 impl Expression for Identifier {
     fn expression_node(&self) {}
 }
@@ -170,5 +209,35 @@ impl Identifier {
             token: token.clone(),
             value: token.literal(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::token::{Token, TokenType};
+
+    #[test]
+    fn test_let_statement() {
+        let mut p = Program::new();
+
+        // Build LetStatement
+        let mut builder = LetStatementBuilder::new(&Token {
+            token_type: TokenType::Let,
+            literal: "let".to_string(),
+        });
+
+        // Add name
+        builder.name(Identifier::new(&Token {
+            token_type: TokenType::Ident,
+            literal: "myVar".to_string(),
+        }));
+
+        // TODO: add expression
+        let stmt = builder.build();
+        p.push(Box::new(stmt));
+
+        assert_eq!(p.string(), "let myVar = <expression will go here>;");
     }
 }
