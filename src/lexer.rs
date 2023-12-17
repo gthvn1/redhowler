@@ -93,10 +93,7 @@ impl<'a> Lexer<'a> {
                         literal: String::from(self.read_number()),
                     };
                 } else {
-                    return Token {
-                        token_type: TokenType::Illegal,
-                        literal: token.to_string(),
-                    };
+                    TokenType::Illegal
                 }
             }
         };
