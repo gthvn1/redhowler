@@ -16,6 +16,7 @@ type PrefixParseFn = fn(&mut Parser) -> Option<Box<dyn ast::Expression>>;
 type InfixParseFn = fn(&mut Parser, Box<dyn ast::Expression>) -> Option<Box<dyn ast::Expression>>;
 
 // Defining precedence
+#[allow(dead_code)]
 enum Precedence {
     Lowest = 1,
     Equals,      // ==
@@ -59,6 +60,9 @@ impl<'l> Parser<'l> {
 
         // Register prefix parsing functions.
         p.register_prefix(TokenType::Ident, |parser| Parser::parse_identifier(parser));
+        p.register_prefix(TokenType::Int, |parser| {
+            Parser::parse_integer_literal(parser)
+        });
 
         // Read two tokens, so cur_token and peek_token will be both set.
         p.next_token();
@@ -150,7 +154,8 @@ impl<'l> Parser<'l> {
 
         stmt_builder.expression(self.parse_expression(Precedence::Lowest));
 
-        // Semi colon is optional. If we have it we skip it but if we don't have it it is fine.
+        // Semi colon is optional. If we have it we skip it but if we don't have
+        // it it is fine.
         if self.peek_token_is(&TokenType::Semicolon) {
             self.next_token();
         }
@@ -162,7 +167,7 @@ impl<'l> Parser<'l> {
     // ========================================================================
     // PARSING EXPRESSIONS
     // ========================================================================
-    fn parse_expression(&mut self, precedence: Precedence) -> Option<Box<dyn ast::Expression>> {
+    fn parse_expression(&mut self, _precedence: Precedence) -> Option<Box<dyn ast::Expression>> {
         let prefix_opt = self.prefix_parse_fns.get(&self.cur_token.token_type);
 
         // Check if we have a parsing function associated with the cirrent token. If we
@@ -176,6 +181,20 @@ impl<'l> Parser<'l> {
 
     fn parse_identifier(&mut self) -> Option<Box<dyn ast::Expression>> {
         Some(Box::new(ast::Identifier::new(&self.cur_token)))
+    }
+
+    fn parse_integer_literal(&mut self) -> Option<Box<dyn ast::Expression>> {
+        return if let Ok(value) = self.cur_token.literal.parse::<i64>() {
+            let lit = ast::IntegerLiteral::new(&self.cur_token, value);
+            Some(Box::new(lit))
+        } else {
+            let msg = format!(
+                "Could not parse {} as integer",
+                self.cur_token.literal.as_str()
+            );
+            self.errors.push(msg);
+            None
+        };
     }
 
     // ========================================================================
@@ -231,6 +250,26 @@ impl<'l> Parser<'l> {
 mod tests {
     use super::*;
     use crate::ast::LetStatement;
+
+    #[test]
+    fn test_integer_literal() {
+        let input = "5;";
+
+        let l = Lexer::new(input);
+        let mut p = Parser::new(l);
+
+        let program = p.parse_program();
+
+        // Check that parser didn't encounter any errors but before print them
+        // if any.
+        p.errors.iter().for_each(|e| eprintln!("{}", e));
+        assert!(p.errors.is_empty());
+
+        assert_eq!(program.statements.len(), 1);
+
+        let stmt = program.statements.get(0).unwrap();
+        assert_eq!(stmt.token_literal(), "5");
+    }
 
     #[test]
     fn test_identifier_expression() {

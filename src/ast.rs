@@ -26,6 +26,7 @@ pub trait Statement: Node {
 pub trait Expression: Node {
     // This dummy method is used for debugging.
     fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any;
 }
 
 // ============================================================================
@@ -261,7 +262,7 @@ impl Statement for ExpressionStatement {
 }
 
 // ============================================================================
-// IDENTIFIER
+// IDENTIFIER EXPRESSION
 // ============================================================================
 // Identifier is a node that holds the name of the variable.
 #[allow(dead_code)]
@@ -282,6 +283,9 @@ impl Node for Identifier {
 
 impl Expression for Identifier {
     fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 }
 
 #[allow(dead_code)]
@@ -290,6 +294,42 @@ impl Identifier {
         Identifier {
             token: token.clone(),
             value: token.literal(),
+        }
+    }
+}
+
+// ============================================================================
+// INTEGET LITERAL EXPRESSION
+// ============================================================================
+#[allow(dead_code)]
+pub struct IntegerLiteral {
+    token: Token, // The token.INT token.
+    value: i64,   // The value of the integer literal.
+}
+
+impl Node for IntegerLiteral {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        self.token.literal()
+    }
+}
+
+impl Expression for IntegerLiteral {
+    fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+#[allow(dead_code)]
+impl IntegerLiteral {
+    pub fn new(token: &Token, value: i64) -> Self {
+        IntegerLiteral {
+            token: token.clone(),
+            value,
         }
     }
 }
