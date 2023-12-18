@@ -7,12 +7,33 @@ use crate::ast::{self};
 use crate::lexer::Lexer;
 use crate::token::{Token, TokenType};
 
+use std::collections::HashMap;
+
+// Pratt parser idea is to associate parsing functions with token types instead
+// of grammar rules. This is called precedence climbing.
+
+type PrefixParseFn = fn(&mut Parser) -> Option<Box<dyn ast::Expression>>;
+type InfixParseFn = fn(&mut Parser, Box<dyn ast::Expression>) -> Option<Box<dyn ast::Expression>>;
+
+// Defining precedence
+enum Precedence {
+    Lowest = 1,
+    Equals,      // ==
+    LessGreater, // > or <
+    Sum,         // +
+    Product,     // *
+    Prefix,      // -X or !X
+    Call,        // myFunction(X)
+}
+
 #[allow(dead_code)]
 struct Parser<'l> {
     lexer: Lexer<'l>,
     cur_token: Token,
     peek_token: Token,
     errors: Vec<String>,
+    prefix_parse_fns: HashMap<TokenType, PrefixParseFn>,
+    infix_parse_fns: HashMap<TokenType, InfixParseFn>,
 }
 
 // TODO: As we have the same lifetime as lexer maybe we can use a reference to
@@ -32,7 +53,12 @@ impl<'l> Parser<'l> {
                 literal: String::from("Dummy"),
             },
             errors: Vec::new(),
+            prefix_parse_fns: HashMap::new(),
+            infix_parse_fns: HashMap::new(),
         };
+
+        // Register prefix parsing functions.
+        p.register_prefix(TokenType::Ident, |parser| Parser::parse_identifier(parser));
 
         // Read two tokens, so cur_token and peek_token will be both set.
         p.next_token();
@@ -55,6 +81,10 @@ impl<'l> Parser<'l> {
         program
     }
 
+    // ========================================================================
+    // PARSING STATEMENTS
+    // ========================================================================
+
     // This is the entry point for parsing a statement.
     // In the current implementation we only support let statements. So if the token
     // matches let we parse a let statement, otherwise we return None.
@@ -63,7 +93,7 @@ impl<'l> Parser<'l> {
         match self.cur_token.token_type {
             TokenType::Let => self.parse_let_statement(),
             TokenType::Return => self.parse_return_statement(),
-            _ => None,
+            _ => self.parse_expression_statement(),
         }
     }
 
@@ -93,17 +123,15 @@ impl<'l> Parser<'l> {
             self.next_token();
         }
 
-        let stmt = stmt_builder.build();
-        Some(Box::new(stmt))
+        let let_stmt = stmt_builder.build();
+        Some(Box::new(let_stmt))
     }
 
     // This is the entry point for parsing a return statement.
     // Return statement is of the form: return <expression>;
     fn parse_return_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         // TODO: add builder. Currently we are skipping the expression.
-        let stmt = ast::ReturnStatement {
-            token: self.cur_token.clone(),
-        };
+        let stmt_builder = ast::ReturnStatementBuilder::new(&self.cur_token);
 
         self.next_token();
 
@@ -112,8 +140,47 @@ impl<'l> Parser<'l> {
             self.next_token();
         }
 
-        Some(Box::new(stmt))
+        let ret_stmt = stmt_builder.build();
+        Some(Box::new(ret_stmt))
     }
+
+    // This is the entry point for parsing an expression statement.
+    fn parse_expression_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
+        let mut stmt_builder = ast::ExpressionStatementBuilder::new(&self.cur_token);
+
+        stmt_builder.expression(self.parse_expression(Precedence::Lowest));
+
+        // Semi colon is optional. If we have it we skip it but if we don't have it it is fine.
+        if self.peek_token_is(&TokenType::Semicolon) {
+            self.next_token();
+        }
+
+        let expr_stmt = stmt_builder.build();
+        Some(Box::new(expr_stmt))
+    }
+
+    // ========================================================================
+    // PARSING EXPRESSIONS
+    // ========================================================================
+    fn parse_expression(&mut self, precedence: Precedence) -> Option<Box<dyn ast::Expression>> {
+        let prefix_opt = self.prefix_parse_fns.get(&self.cur_token.token_type);
+
+        // Check if we have a parsing function associated with the cirrent token. If we
+        // do we call it, otherwise we return None.
+        if let Some(prefix) = prefix_opt {
+            prefix(self)
+        } else {
+            None
+        }
+    }
+
+    fn parse_identifier(&mut self) -> Option<Box<dyn ast::Expression>> {
+        Some(Box::new(ast::Identifier::new(&self.cur_token)))
+    }
+
+    // ========================================================================
+    // HELPERS FUNCTIONS
+    // ========================================================================
 
     // Advance the lexer by one token and update the current and peek tokens.
     fn next_token(&mut self) {
@@ -150,13 +217,40 @@ impl<'l> Parser<'l> {
         );
         self.errors.push(msg);
     }
+
+    fn register_prefix(&mut self, token_type: TokenType, func: PrefixParseFn) {
+        self.prefix_parse_fns.insert(token_type, func);
+    }
+
+    fn register_infix(&mut self, token_type: TokenType, func: InfixParseFn) {
+        self.infix_parse_fns.insert(token_type, func);
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::ast::LetStatement;
 
-    use super::*;
+    #[test]
+    fn test_identifier_expression() {
+        let input = "foobar;";
+
+        let l = Lexer::new(input);
+        let mut p = Parser::new(l);
+
+        let program = p.parse_program();
+
+        // Check that parser didn't encounter any errors but before print them
+        // if any.
+        p.errors.iter().for_each(|e| eprintln!("{}", e));
+        assert!(p.errors.is_empty());
+
+        assert_eq!(program.statements.len(), 1);
+
+        let stmt = program.statements.get(0).unwrap();
+        assert_eq!(stmt.token_literal(), "foobar");
+    }
 
     #[test]
     fn test_return_statements() {
