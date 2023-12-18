@@ -1,5 +1,5 @@
 // Token definitions for the Monkey language.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Eq, Hash, PartialEq, Debug, Clone)]
 pub enum TokenType {
     // Special tokens
     Illegal,

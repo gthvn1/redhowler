@@ -11,6 +11,11 @@ pub trait Node {
 }
 
 // Statement does not produce value.
+// We will have
+//   - LetStatement
+//   - ReturnStatement
+//   - ExpressionStatement: An expression statement is one that evaluates an
+//   expression and ignores its result
 pub trait Statement: Node {
     // This dummy method is used for debugging.
     fn statement_node(&self);
@@ -150,6 +155,29 @@ impl LetStatement {
 // RETURN STATEMENT
 // ============================================================================
 #[allow(dead_code)]
+pub struct ReturnStatementBuilder {
+    token: Token,
+    //return_value: Option<Box<dyn Expression>>,
+}
+
+impl ReturnStatementBuilder {
+    pub fn new(token: &Token) -> Self {
+        ReturnStatementBuilder {
+            token: token.clone(),
+            //return_value: None,
+        }
+    }
+
+    pub fn build(self) -> ReturnStatement {
+        ReturnStatement {
+            token: self.token,
+            //return_value: self.return_value.unwrap(),
+        }
+    }
+}
+
+#[allow(dead_code)]
+
 pub struct ReturnStatement {
     pub token: Token, // The token.RETURN token.
                       //pub return_value: Box<dyn Expression>, // TODO: Implement Expression.
@@ -172,6 +200,60 @@ impl Node for ReturnStatement {
 }
 
 impl Statement for ReturnStatement {
+    fn statement_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+// ============================================================================
+// EXPRESSION STATEMENT
+// ============================================================================
+#[allow(dead_code)]
+pub struct ExpressionStatementBuilder {
+    token: Token,
+    expression: Option<Box<dyn Expression>>,
+}
+
+#[allow(dead_code)]
+impl ExpressionStatementBuilder {
+    pub fn new(token: &Token) -> Self {
+        ExpressionStatementBuilder {
+            token: token.clone(),
+            expression: None,
+        }
+    }
+
+    pub fn expression(&mut self, expression: Option<Box<dyn Expression>>) {
+        self.expression = expression;
+    }
+
+    pub fn build(self) -> ExpressionStatement {
+        ExpressionStatement {
+            token: self.token,
+            expression: self.expression.unwrap(),
+        }
+    }
+}
+
+pub struct ExpressionStatement {
+    pub token: Token, // The first token of the expression.
+    pub expression: Box<dyn Expression>,
+}
+
+impl Node for ExpressionStatement {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+        out.push_str(&self.token_literal());
+        out
+    }
+}
+
+impl Statement for ExpressionStatement {
     fn statement_node(&self) {}
     fn as_any(&self) -> &dyn Any {
         self
