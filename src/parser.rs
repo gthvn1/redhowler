@@ -63,6 +63,12 @@ impl<'l> Parser<'l> {
         p.register_prefix(TokenType::Int, |parser| {
             Parser::parse_integer_literal(parser)
         });
+        p.register_prefix(TokenType::Bang, |parser| {
+            Parser::parse_prefix_expression(parser)
+        });
+        p.register_prefix(TokenType::Minus, |parser| {
+            Parser::parse_prefix_expression(parser)
+        });
 
         // Read two tokens, so cur_token and peek_token will be both set.
         p.next_token();
@@ -170,11 +176,16 @@ impl<'l> Parser<'l> {
     fn parse_expression(&mut self, _precedence: Precedence) -> Option<Box<dyn ast::Expression>> {
         let prefix_opt = self.prefix_parse_fns.get(&self.cur_token.token_type);
 
-        // Check if we have a parsing function associated with the cirrent token. If we
+        // Check if we have a parsing function associated with the current token. If we
         // do we call it, otherwise we return None.
         if let Some(prefix) = prefix_opt {
             prefix(self)
         } else {
+            let msg = format!(
+                "No prefix parse function found for {:?}",
+                self.cur_token.token_type
+            );
+            self.errors.push(msg);
             None
         }
     }
@@ -195,6 +206,17 @@ impl<'l> Parser<'l> {
             self.errors.push(msg);
             None
         };
+    }
+
+    fn parse_prefix_expression(&mut self) -> Option<Box<dyn ast::Expression>> {
+        let mut expr_builder = ast::PrefixExpressionBuilder::new(&self.cur_token);
+        expr_builder.operator(self.cur_token.literal.clone());
+
+        self.next_token();
+
+        expr_builder.right(self.parse_expression(Precedence::Prefix));
+
+        Some(Box::new(expr_builder.build()))
     }
 
     // ========================================================================
@@ -249,7 +271,60 @@ impl<'l> Parser<'l> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::LetStatement;
+    use crate::ast::{ExpressionStatement, LetStatement, PrefixExpression};
+
+    #[test]
+    fn test_parsing_prefix_expressions() {
+        #[allow(dead_code)]
+        struct PrefixTest {
+            input: &'static str,
+            operator: &'static str,
+            value: i64,
+        }
+
+        let prefix_tests = vec![
+            PrefixTest {
+                input: "!5;",
+                operator: "!",
+                value: 5,
+            },
+            PrefixTest {
+                input: "-15;",
+                operator: "-",
+                value: 15,
+            },
+        ];
+
+        prefix_tests.iter().for_each(|tt| {
+            let l = Lexer::new(tt.input);
+            let mut p = Parser::new(l);
+
+            let program = p.parse_program();
+
+            // Check that parser didn't encounter any errors but before print
+            // them if any.
+            p.errors.iter().for_each(|e| eprintln!("{}", e));
+            assert!(p.errors.is_empty());
+
+            assert_eq!(program.statements.len(), 1);
+
+            let stmt = program.statements.get(0).unwrap();
+            if let Some(expr_stmt) = stmt.as_any().downcast_ref::<ExpressionStatement>() {
+                if let Some(prefix_expr) = expr_stmt
+                    .expression
+                    .as_any()
+                    .downcast_ref::<PrefixExpression>()
+                {
+                    assert_eq!(prefix_expr.operator, tt.operator);
+                    //assert_eq!(prefix_expr.right., tt.value);
+                } else {
+                    panic!("Expected PrefixExpression");
+                }
+            } else {
+                panic!("Expected ExpressionStatement");
+            }
+        });
+    }
 
     #[test]
     fn test_integer_literal() {
