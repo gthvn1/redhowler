@@ -1,5 +1,5 @@
 // AST is Nodes connected each other.
-use crate::token::Token;
+use super::token::Token;
 use std::any::Any;
 
 // Every node in our AST has to implement the Node trait.
@@ -407,7 +407,7 @@ impl Expression for PrefixExpression {
 mod tests {
 
     use super::*;
-    use crate::token::{Token, TokenType};
+    use crate::interpreter::token::{Token, TokenType};
 
     #[test]
     fn test_let_statement() {

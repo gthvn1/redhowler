@@ -3,9 +3,9 @@
 // in the process.
 // We are constructing a recursive descent parser, which is a type of top-down
 // parsing.
-use crate::ast::{self};
-use crate::lexer::Lexer;
-use crate::token::{Token, TokenType};
+use super::ast::{self};
+use super::lexer::Lexer;
+use super::token::{Token, TokenType};
 
 use std::collections::HashMap;
 
@@ -271,7 +271,7 @@ impl<'l> Parser<'l> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{ExpressionStatement, LetStatement, PrefixExpression};
+    use crate::interpreter::ast::{ExpressionStatement, LetStatement, PrefixExpression};
 
     #[test]
     fn test_parsing_prefix_expressions() {

@@ -1,6 +1,5 @@
-use crate::lexer::Lexer;
-use crate::token::TokenType;
-use std::io::{self, Write};
+use crate::interpreter::{lexer, token};
+use std::io::{self, Write}; // Add this line
 
 pub fn start() {
     loop {
@@ -21,10 +20,10 @@ pub fn start() {
             break;
         }
 
-        let mut l = Lexer::new(&input);
+        let mut l = lexer::Lexer::new(&input);
         loop {
             let tok = l.next_token();
-            if tok.token_type == TokenType::EOF {
+            if tok.token_type == token::TokenType::EOF {
                 break;
             }
             println!("{:?}", tok);

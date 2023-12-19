@@ -1,8 +1,6 @@
-mod ast;
-mod lexer;
-mod parser;
-mod repl;
-mod token;
+extern crate redhowler;
+
+use redhowler::repl;
 
 fn main() {
     println!("Welcome to Monkey Islang!!!");
