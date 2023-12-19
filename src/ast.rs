@@ -299,7 +299,7 @@ impl Identifier {
 }
 
 // ============================================================================
-// INTEGET LITERAL EXPRESSION
+// INTEGER LITERAL EXPRESSION
 // ============================================================================
 #[allow(dead_code)]
 pub struct IntegerLiteral {
@@ -334,6 +334,75 @@ impl IntegerLiteral {
     }
 }
 
+// ============================================================================
+// PREFIX EXPRESSION
+// ============================================================================
+#[allow(dead_code)]
+pub struct PrefixExpressionBuilder {
+    pub token: Token, // The prefix token, Monkey has only ! and -.
+    pub operator: Option<String>,
+    pub right: Option<Box<dyn Expression>>,
+}
+
+impl PrefixExpressionBuilder {
+    pub fn new(token: &Token) -> Self {
+        PrefixExpressionBuilder {
+            token: token.clone(),
+            operator: None,
+            right: None,
+        }
+    }
+
+    pub fn operator(&mut self, operator: String) {
+        self.operator = Some(operator);
+    }
+
+    pub fn right(&mut self, right: Option<Box<dyn Expression>>) {
+        self.right = right;
+    }
+
+    pub fn build(self) -> PrefixExpression {
+        PrefixExpression {
+            token: self.token,
+            operator: self.operator.unwrap(),
+            right: self.right.unwrap(),
+        }
+    }
+}
+
+#[allow(dead_code)]
+pub struct PrefixExpression {
+    pub token: Token, // The prefix token, Monkey has only ! and -.
+    pub operator: String,
+    pub right: Box<dyn Expression>,
+}
+
+impl Node for PrefixExpression {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+
+        out.push('(');
+        out.push_str(self.operator.as_str());
+        out.push_str(&self.right.string());
+        out.push(')');
+        out
+    }
+}
+
+impl Expression for PrefixExpression {
+    fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+// ============================================================================
+// TESTS
+// ============================================================================
 #[cfg(test)]
 mod tests {
 
