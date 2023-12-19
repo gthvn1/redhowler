@@ -1,5 +1,5 @@
 use crate::interpreter::{lexer, token};
-use std::io::{self, Write}; // Add this line
+use std::io::{self, Write};
 
 pub fn start() {
     loop {
