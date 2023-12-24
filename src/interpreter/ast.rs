@@ -332,6 +332,10 @@ impl IntegerLiteral {
             value,
         }
     }
+
+    pub fn value(&self) -> i64 {
+        self.value
+    }
 }
 
 // ============================================================================
@@ -394,6 +398,83 @@ impl Node for PrefixExpression {
 }
 
 impl Expression for PrefixExpression {
+    fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+// ============================================================================
+// INFIX EXPRESSION
+// ============================================================================
+#[allow(dead_code)]
+pub struct InfixExpressionBuilder {
+    pub token: Token, // The prefix token: +, -, *, /, <, > ...
+    pub left: Option<Box<dyn Expression>>,
+    pub operator: Option<String>,
+    pub right: Option<Box<dyn Expression>>,
+}
+
+impl InfixExpressionBuilder {
+    pub fn new(token: &Token) -> Self {
+        InfixExpressionBuilder {
+            token: token.clone(),
+            left: None,
+            operator: None,
+            right: None,
+        }
+    }
+
+    pub fn left(&mut self, left: Option<Box<dyn Expression>>) {
+        self.left = left;
+    }
+
+    pub fn operator(&mut self, operator: String) {
+        self.operator = Some(operator);
+    }
+
+    pub fn right(&mut self, right: Option<Box<dyn Expression>>) {
+        self.right = right;
+    }
+
+    pub fn build(self) -> InfixExpression {
+        InfixExpression {
+            token: self.token,
+            left: self.left.unwrap(),
+            operator: self.operator.unwrap(),
+            right: self.right.unwrap(),
+        }
+    }
+}
+
+#[allow(dead_code)]
+pub struct InfixExpression {
+    pub token: Token, // The prefix token: +, -, *, /, <, > ...
+    pub left: Box<dyn Expression>,
+    pub operator: String,
+    pub right: Box<dyn Expression>,
+}
+
+impl Node for InfixExpression {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+
+        out.push('(');
+        out.push_str(&self.left.string());
+        out.push(' ');
+        out.push_str(self.operator.as_str());
+        out.push(' ');
+        out.push_str(&self.right.string());
+        out.push(')');
+        out
+    }
+}
+
+impl Expression for InfixExpression {
     fn expression_node(&self) {}
     fn as_any(&self) -> &dyn Any {
         self
