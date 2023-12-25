@@ -3,7 +3,7 @@ use redhowler::interpreter::token::{Token, TokenType};
 
 #[test]
 fn test_let_statement() {
-    let mut p = Program::new();
+    let mut p = Program::default();
 
     // Build LetStatement
     let mut builder = LetStatementBuilder::new(&Token {

@@ -84,7 +84,7 @@ impl<'a> Lexer<'a> {
                         },
                         literal: String::from(ident),
                     };
-                } else if token.is_digit(10) {
+                } else if token.is_ascii_digit() {
                     // read_number() returns a new String from slice of input
                     // string. And as above, we return directly because we already
                     // did the self.read_char().
@@ -146,7 +146,7 @@ impl<'a> Lexer<'a> {
     // Return a slice of the number in base 10 from the current position.
     fn read_number(&mut self) -> &str {
         let pos = self.position;
-        while self.ch.is_digit(10) {
+        while self.ch.is_ascii_digit() {
             self.read_char();
         }
         &self.input[pos..self.position]

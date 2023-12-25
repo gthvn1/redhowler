@@ -44,6 +44,12 @@ pub struct Program {
     pub statements: Vec<Box<dyn Statement>>,
 }
 
+impl Default for Program {
+    fn default() -> Self {
+        Program::new()
+    }
+}
+
 #[allow(dead_code)]
 impl Program {
     pub fn new() -> Self {
@@ -57,7 +63,7 @@ impl Program {
     }
 
     pub fn token_literal(&self) -> String {
-        if self.statements.len() > 0 {
+        if !self.statements.is_empty() {
             self.statements[0].token_literal()
         } else {
             String::from("")
@@ -127,13 +133,13 @@ impl Node for LetStatement {
     fn string(&self) -> String {
         let mut out = String::new();
         out.push_str(&self.token_literal());
-        out.push_str(" ");
+        out.push(' ');
         out.push_str(&self.name.value);
         out.push_str(" = ");
         // TODO: Add expresionn when implemented
         //out.push_str(&self.value.string());
         out.push_str("<expression will go here>");
-        out.push_str(";");
+        out.push(';');
         out
     }
 }
@@ -192,10 +198,10 @@ impl Node for ReturnStatement {
     fn string(&self) -> String {
         let mut out = String::new();
         out.push_str(&self.token_literal());
-        out.push_str(" ");
+        out.push(' ');
         // TODO: Add expresionn when implemented
         out.push_str("<return value will go here>");
-        out.push_str(";");
+        out.push(';');
         out
     }
 }

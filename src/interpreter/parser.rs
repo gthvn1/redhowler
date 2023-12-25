@@ -106,7 +106,7 @@ impl<'l> Parser<'l> {
     // This is the entry point for parsing a program.
     // We keep parsing statements until we reach the end of the input.
     pub fn parse_program(&mut self) -> ast::Program {
-        let mut program = ast::Program::new();
+        let mut program = ast::Program::default();
 
         while self.cur_token.token_type != TokenType::EOF {
             let stmt_opt = self.parse_statement();
@@ -223,7 +223,7 @@ impl<'l> Parser<'l> {
                 }
             }
 
-            return left_expr;
+            left_expr
         } else {
             let msg = format!(
                 "No prefix parse function found for {:?}",
@@ -239,7 +239,7 @@ impl<'l> Parser<'l> {
     }
 
     fn parse_integer_literal(&mut self) -> Option<Box<dyn ast::Expression>> {
-        return if let Ok(value) = self.cur_token.literal.parse::<i64>() {
+        if let Ok(value) = self.cur_token.literal.parse::<i64>() {
             let lit = ast::IntegerLiteral::new(&self.cur_token, value);
             Some(Box::new(lit))
         } else {
@@ -249,7 +249,7 @@ impl<'l> Parser<'l> {
             );
             self.errors.push(msg);
             None
-        };
+        }
     }
 
     fn parse_prefix_expression(&mut self) -> Option<Box<dyn ast::Expression>> {
