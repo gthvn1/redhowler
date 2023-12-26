@@ -44,6 +44,12 @@ pub struct Program {
     pub statements: Vec<Box<dyn Statement>>,
 }
 
+impl Default for Program {
+    fn default() -> Self {
+        Program::new()
+    }
+}
+
 #[allow(dead_code)]
 impl Program {
     pub fn new() -> Self {
@@ -57,7 +63,7 @@ impl Program {
     }
 
     pub fn token_literal(&self) -> String {
-        if self.statements.len() > 0 {
+        if !self.statements.is_empty() {
             self.statements[0].token_literal()
         } else {
             String::from("")
@@ -86,7 +92,7 @@ impl Program {
 pub struct LetStatementBuilder {
     token: Token,
     name: Option<Identifier>,
-    //value: Option<Box<dyn Expression>>,
+    value: Option<Box<dyn Expression>>,
 }
 
 #[allow(dead_code)]
@@ -95,7 +101,7 @@ impl LetStatementBuilder {
         LetStatementBuilder {
             token: token.clone(),
             name: None,
-            //value: None,
+            value: None,
         }
     }
 
@@ -103,11 +109,15 @@ impl LetStatementBuilder {
         self.name = Some(name);
     }
 
+    pub fn value(&mut self, value: Option<Box<dyn Expression>>) {
+        self.value = value;
+    }
+
     pub fn build(self) -> LetStatement {
         LetStatement {
             token: self.token,
             name: self.name.unwrap(),
-            //value: self.value.unwrap(),
+            value: self.value.unwrap(),
         }
     }
 }
@@ -116,7 +126,7 @@ impl LetStatementBuilder {
 pub struct LetStatement {
     token: Token, // The token.LET token.
     name: Identifier,
-    //value: Box<dyn Expression>, // TODO: Implement Expression.
+    value: Box<dyn Expression>,
 }
 
 impl Node for LetStatement {
@@ -127,13 +137,13 @@ impl Node for LetStatement {
     fn string(&self) -> String {
         let mut out = String::new();
         out.push_str(&self.token_literal());
-        out.push_str(" ");
+        out.push(' ');
         out.push_str(&self.name.value);
         out.push_str(" = ");
-        // TODO: Add expresionn when implemented
-        //out.push_str(&self.value.string());
-        out.push_str("<expression will go here>");
-        out.push_str(";");
+
+        out.push_str(&self.value.string());
+
+        out.push(';');
         out
     }
 }
@@ -158,21 +168,25 @@ impl LetStatement {
 #[allow(dead_code)]
 pub struct ReturnStatementBuilder {
     token: Token,
-    //return_value: Option<Box<dyn Expression>>,
+    return_value: Option<Box<dyn Expression>>,
 }
 
 impl ReturnStatementBuilder {
     pub fn new(token: &Token) -> Self {
         ReturnStatementBuilder {
             token: token.clone(),
-            //return_value: None,
+            return_value: None,
         }
+    }
+
+    pub fn return_value(&mut self, return_value: Option<Box<dyn Expression>>) {
+        self.return_value = return_value;
     }
 
     pub fn build(self) -> ReturnStatement {
         ReturnStatement {
             token: self.token,
-            //return_value: self.return_value.unwrap(),
+            return_value: self.return_value.unwrap(),
         }
     }
 }
@@ -181,7 +195,7 @@ impl ReturnStatementBuilder {
 
 pub struct ReturnStatement {
     pub token: Token, // The token.RETURN token.
-                      //pub return_value: Box<dyn Expression>, // TODO: Implement Expression.
+    pub return_value: Box<dyn Expression>,
 }
 
 impl Node for ReturnStatement {
@@ -192,10 +206,9 @@ impl Node for ReturnStatement {
     fn string(&self) -> String {
         let mut out = String::new();
         out.push_str(&self.token_literal());
-        out.push_str(" ");
-        // TODO: Add expresionn when implemented
-        out.push_str("<return value will go here>");
-        out.push_str(";");
+        out.push(' ');
+        out.push_str(&self.return_value.string());
+        out.push(';');
         out
     }
 }
@@ -249,7 +262,7 @@ impl Node for ExpressionStatement {
 
     fn string(&self) -> String {
         let mut out = String::new();
-        out.push_str(&self.token_literal());
+        out.push_str(&self.expression.string());
         out
     }
 }
@@ -332,6 +345,10 @@ impl IntegerLiteral {
             value,
         }
     }
+
+    pub fn value(&self) -> i64 {
+        self.value
+    }
 }
 
 // ============================================================================
@@ -401,34 +418,78 @@ impl Expression for PrefixExpression {
 }
 
 // ============================================================================
-// TESTS
+// INFIX EXPRESSION
 // ============================================================================
-#[cfg(test)]
-mod tests {
+#[allow(dead_code)]
+pub struct InfixExpressionBuilder {
+    pub token: Token, // The prefix token: +, -, *, /, <, > ...
+    pub left: Option<Box<dyn Expression>>,
+    pub operator: Option<String>,
+    pub right: Option<Box<dyn Expression>>,
+}
 
-    use super::*;
-    use crate::interpreter::token::{Token, TokenType};
+impl InfixExpressionBuilder {
+    pub fn new(token: &Token) -> Self {
+        InfixExpressionBuilder {
+            token: token.clone(),
+            left: None,
+            operator: None,
+            right: None,
+        }
+    }
 
-    #[test]
-    fn test_let_statement() {
-        let mut p = Program::new();
+    pub fn left(&mut self, left: Option<Box<dyn Expression>>) {
+        self.left = left;
+    }
 
-        // Build LetStatement
-        let mut builder = LetStatementBuilder::new(&Token {
-            token_type: TokenType::Let,
-            literal: "let".to_string(),
-        });
+    pub fn operator(&mut self, operator: String) {
+        self.operator = Some(operator);
+    }
 
-        // Add name
-        builder.name(Identifier::new(&Token {
-            token_type: TokenType::Ident,
-            literal: "myVar".to_string(),
-        }));
+    pub fn right(&mut self, right: Option<Box<dyn Expression>>) {
+        self.right = right;
+    }
 
-        // TODO: add expression
-        let stmt = builder.build();
-        p.push(Box::new(stmt));
+    pub fn build(self) -> InfixExpression {
+        InfixExpression {
+            token: self.token,
+            left: self.left.unwrap(),
+            operator: self.operator.unwrap(),
+            right: self.right.unwrap(),
+        }
+    }
+}
 
-        assert_eq!(p.string(), "let myVar = <expression will go here>;");
+#[allow(dead_code)]
+pub struct InfixExpression {
+    pub token: Token, // The prefix token: +, -, *, /, <, > ...
+    pub left: Box<dyn Expression>,
+    pub operator: String,
+    pub right: Box<dyn Expression>,
+}
+
+impl Node for InfixExpression {
+    fn token_literal(&self) -> String {
+        self.token.literal()
+    }
+
+    fn string(&self) -> String {
+        let mut out = String::new();
+
+        out.push('(');
+        out.push_str(&self.left.string());
+        out.push(' ');
+        out.push_str(self.operator.as_str());
+        out.push(' ');
+        out.push_str(&self.right.string());
+        out.push(')');
+        out
+    }
+}
+
+impl Expression for InfixExpression {
+    fn expression_node(&self) {}
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
