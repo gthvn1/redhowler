@@ -92,7 +92,7 @@ impl Program {
 pub struct LetStatementBuilder {
     token: Token,
     name: Option<Identifier>,
-    //value: Option<Box<dyn Expression>>,
+    value: Option<Box<dyn Expression>>,
 }
 
 #[allow(dead_code)]
@@ -101,7 +101,7 @@ impl LetStatementBuilder {
         LetStatementBuilder {
             token: token.clone(),
             name: None,
-            //value: None,
+            value: None,
         }
     }
 
@@ -109,11 +109,15 @@ impl LetStatementBuilder {
         self.name = Some(name);
     }
 
+    pub fn value(&mut self, value: Option<Box<dyn Expression>>) {
+        self.value = value;
+    }
+
     pub fn build(self) -> LetStatement {
         LetStatement {
             token: self.token,
             name: self.name.unwrap(),
-            //value: self.value.unwrap(),
+            value: self.value.unwrap(),
         }
     }
 }
@@ -122,7 +126,7 @@ impl LetStatementBuilder {
 pub struct LetStatement {
     token: Token, // The token.LET token.
     name: Identifier,
-    //value: Box<dyn Expression>, // TODO: Implement Expression.
+    value: Box<dyn Expression>,
 }
 
 impl Node for LetStatement {
@@ -136,9 +140,9 @@ impl Node for LetStatement {
         out.push(' ');
         out.push_str(&self.name.value);
         out.push_str(" = ");
-        // TODO: Add expresionn when implemented
-        //out.push_str(&self.value.string());
-        out.push_str("<expression will go here>");
+
+        out.push_str(&self.value.string());
+
         out.push(';');
         out
     }
@@ -164,21 +168,25 @@ impl LetStatement {
 #[allow(dead_code)]
 pub struct ReturnStatementBuilder {
     token: Token,
-    //return_value: Option<Box<dyn Expression>>,
+    return_value: Option<Box<dyn Expression>>,
 }
 
 impl ReturnStatementBuilder {
     pub fn new(token: &Token) -> Self {
         ReturnStatementBuilder {
             token: token.clone(),
-            //return_value: None,
+            return_value: None,
         }
+    }
+
+    pub fn return_value(&mut self, return_value: Option<Box<dyn Expression>>) {
+        self.return_value = return_value;
     }
 
     pub fn build(self) -> ReturnStatement {
         ReturnStatement {
             token: self.token,
-            //return_value: self.return_value.unwrap(),
+            return_value: self.return_value.unwrap(),
         }
     }
 }
@@ -187,7 +195,7 @@ impl ReturnStatementBuilder {
 
 pub struct ReturnStatement {
     pub token: Token, // The token.RETURN token.
-                      //pub return_value: Box<dyn Expression>, // TODO: Implement Expression.
+    pub return_value: Box<dyn Expression>,
 }
 
 impl Node for ReturnStatement {
@@ -199,8 +207,7 @@ impl Node for ReturnStatement {
         let mut out = String::new();
         out.push_str(&self.token_literal());
         out.push(' ');
-        // TODO: Add expresionn when implemented
-        out.push_str("<return value will go here>");
+        out.push_str(&self.return_value.string());
         out.push(';');
         out
     }
@@ -255,7 +262,7 @@ impl Node for ExpressionStatement {
 
     fn string(&self) -> String {
         let mut out = String::new();
-        out.push_str(&self.token_literal());
+        out.push_str(&self.expression.string());
         out
     }
 }

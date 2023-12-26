@@ -125,7 +125,6 @@ impl<'l> Parser<'l> {
     // This is the entry point for parsing a statement.
     // In the current implementation we only support let statements. So if the token
     // matches let we parse a let statement, otherwise we return None.
-    // TODO: support others statements like return.
     fn parse_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
         match self.cur_token.token_type {
             TokenType::Let => self.parse_let_statement(),
@@ -156,6 +155,10 @@ impl<'l> Parser<'l> {
         }
 
         // TODO: We're skipping the expressions until we encounter a semicolon.
+        // To be able to build it we pass a dummy expression.
+        let dummy_expr = ast::Identifier::new(&self.cur_token);
+        stmt_builder.value(Some(Box::new(dummy_expr)));
+
         while !self.cur_token_is(&TokenType::Semicolon) {
             self.next_token();
         }
@@ -167,12 +170,15 @@ impl<'l> Parser<'l> {
     // This is the entry point for parsing a return statement.
     // Return statement is of the form: return <expression>;
     fn parse_return_statement(&mut self) -> Option<Box<dyn ast::Statement>> {
-        // TODO: add builder. Currently we are skipping the expression.
-        let stmt_builder = ast::ReturnStatementBuilder::new(&self.cur_token);
+        let mut stmt_builder = ast::ReturnStatementBuilder::new(&self.cur_token);
 
         self.next_token();
 
         // TODO: We're skipping the expressions until we encounter a semicolon.
+        // To be able to build it we pass a dummy expression.
+        let dummy_expr = ast::Identifier::new(&self.cur_token);
+        stmt_builder.return_value(Some(Box::new(dummy_expr)));
+
         while !self.cur_token_is(&TokenType::Semicolon) {
             self.next_token();
         }

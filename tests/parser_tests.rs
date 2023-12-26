@@ -7,6 +7,79 @@ mod tests {
     use redhowler::interpreter::parser::Parser;
 
     #[test]
+    fn test_operator_precedence_parsing() {
+        #[allow(dead_code)]
+        struct OperatorPrecedenceTest {
+            input: &'static str,
+            expected: &'static str,
+        }
+
+        let tests = vec![
+            OperatorPrecedenceTest {
+                input: "-a * b",
+                expected: "((-a) * b)",
+            },
+            OperatorPrecedenceTest {
+                input: "!-a",
+                expected: "(!(-a))",
+            },
+            OperatorPrecedenceTest {
+                input: "a + b + c",
+                expected: "((a + b) + c)",
+            },
+            OperatorPrecedenceTest {
+                input: "a + b - c",
+                expected: "((a + b) - c)",
+            },
+            OperatorPrecedenceTest {
+                input: "a * b * c",
+                expected: "((a * b) * c)",
+            },
+            OperatorPrecedenceTest {
+                input: "a * b / c",
+                expected: "((a * b) / c)",
+            },
+            OperatorPrecedenceTest {
+                input: "a + b / c",
+                expected: "(a + (b / c))",
+            },
+            OperatorPrecedenceTest {
+                input: "a + b * c + d / e - f",
+                expected: "(((a + (b * c)) + (d / e)) - f)",
+            },
+            OperatorPrecedenceTest {
+                input: "3 + 4; -5 * 5",
+                expected: "(3 + 4)((-5) * 5)",
+            },
+            OperatorPrecedenceTest {
+                input: "5 > 4 == 3 < 4",
+                expected: "((5 > 4) == (3 < 4))",
+            },
+            OperatorPrecedenceTest {
+                input: "5 < 4 != 3 > 4",
+                expected: "((5 < 4) != (3 > 4))",
+            },
+            OperatorPrecedenceTest {
+                input: "3 + 4 * 5 == 3 * 1 + 4 * 5",
+                expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+            },
+        ];
+
+        for tt in tests.iter() {
+            let l = Lexer::new(tt.input);
+            let mut p = Parser::new(l);
+
+            let program = p.parse_program();
+
+            // Check that parser didn't encounter any errors but before print
+            // them if any.
+            p.errors.iter().for_each(|e| eprintln!("{}", e));
+            assert!(p.errors.is_empty());
+
+            assert_eq!(program.string(), tt.expected);
+        }
+    }
+    #[test]
     fn test_parsing_infix_expressions() {
         #[allow(dead_code)]
         struct InfixTest {

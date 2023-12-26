@@ -1,3 +1,4 @@
+use redhowler::interpreter::ast;
 use redhowler::interpreter::ast::{Identifier, LetStatementBuilder, Program};
 use redhowler::interpreter::token::{Token, TokenType};
 
@@ -17,9 +18,15 @@ fn test_let_statement() {
         literal: "myVar".to_string(),
     }));
 
-    // TODO: add expression
+    // Add value
+    let id_token = Token {
+        token_type: TokenType::Ident,
+        literal: "anotherVar".to_string(),
+    };
+    let id = ast::Identifier::new(&id_token);
+    builder.value(Some(Box::new(id)));
     let stmt = builder.build();
     p.push(Box::new(stmt));
 
-    assert_eq!(p.string(), "let myVar = <expression will go here>;");
+    assert_eq!(p.string(), "let myVar = anotherVar;");
 }
