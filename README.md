@@ -28,3 +28,6 @@ before us...
 - [x] Start the REPL
 - [ ] Parsing
 - [ ] Evaluation
+
+---
+![](https://github.com/gthvn1/redhowler/blob/master/screenshots/lexer.png)
