@@ -14,3 +14,17 @@ construction of our code, the famous **"Hello, Monkey Islang!"**.
 With bated breath and vigilant eyes, we observe in real-time the unfolding 
 spectacle, seeking insight into the enigmatic tapestry of events that transpire
 before us...
+
+---
+
+- Currently only the lexer is available and you can use the REPL to tokenize it
+- Parsing is in progress...
+- `cargo run`
+
+
+# Todo
+
+- [x] Lexical Analysis
+- [x] Start the REPL
+- [ ] Parsing
+- [ ] Evaluation
