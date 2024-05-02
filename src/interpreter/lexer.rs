@@ -113,9 +113,10 @@ impl<'a> Lexer<'a> {
             self.ch = 0 as char;
         } else {
             self.ch = self.input.as_bytes()[self.read_position] as char;
-            self.position = self.read_position;
-            self.read_position += 1;
         }
+
+        self.position = self.read_position;
+        self.read_position += 1;
     }
 
     // Return the next character without advancing our position in the input.
