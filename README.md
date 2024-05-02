@@ -17,7 +17,7 @@ before us...
 
 ---
 
-- Currently only the lexer is available and you can use the REPL to tokenize it
+- Currently only the lexer is available and you can use the REPL to tokenize
 - Parsing is in progress...
 - `cargo run`
 
