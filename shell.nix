@@ -1,5 +1,11 @@
 with import <nixpkgs> {};
 
 mkShell {
-	nativeBuildInputs = [ rustup rust-analyzer ];
+  packages = with pkgs; [
+    cargo
+    clippy
+    rust-analyzer
+    rustc
+    rustfmt
+  ];
 }
