@@ -17,10 +17,22 @@ before us...
 
 ---
 
+- Run using `cargo run`
 - Currently only the lexer is available and you can use the REPL to tokenize
+```sh
+Welcome to Monkey Islang!!!
+This is the REPL for Monkey programming language.
+Feel free to type some code. Ctrl+D to quit
+>> let a = 10;
+Token { token_type: Let, literal: "let" }
+Token { token_type: Ident, literal: "a" }
+Token { token_type: Assign, literal: "=" }
+Token { token_type: Int, literal: "10" }
+Token { token_type: Semicolon, literal: ";" }
+>> detected Ctrl+D, exited.
+May your trip be as enjoyable as finding extra bananas at the bottom of the bag!
+```
 - Parsing is in progress...
-- `cargo run`
-
 
 # Todo
 
@@ -28,6 +40,3 @@ before us...
 - [x] Start the REPL
 - [ ] Parsing
 - [ ] Evaluation
-
----
-![](https://github.com/gthvn1/redhowler/blob/master/screenshots/lexer.png)
