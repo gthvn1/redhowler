@@ -7,8 +7,8 @@ pub struct Lexer<'a> {
     ch: char,             // Current char under examination.
 }
 
-impl<'a> Lexer<'a> {
-    pub fn new(input: &'a str) -> Lexer {
+impl Lexer<'_> {
+    pub fn new(input: &str) -> Lexer {
         let mut l = Lexer {
             input,
             position: 0,
@@ -20,89 +20,6 @@ impl<'a> Lexer<'a> {
         // returning.
         l.read_char();
         l
-    }
-
-    pub fn next_token(&mut self) -> Token {
-        self.skip_whitespace();
-
-        let token = self.ch;
-        let mut literal = token.to_string();
-        let token_type = match token {
-            ';' => TokenType::Semicolon,
-            '(' => TokenType::LParen,
-            ')' => TokenType::RParen,
-            ',' => TokenType::Comma,
-            '+' => TokenType::Plus,
-            '-' => TokenType::Minus,
-            '/' => TokenType::Slash,
-            '*' => TokenType::Asterisk,
-            '<' => TokenType::LT,
-            '>' => TokenType::GT,
-            '{' => TokenType::LBrace,
-            '}' => TokenType::RBrace,
-            '\0' => TokenType::EOF,
-            '=' => {
-                // Here we don't know yet if it assign or equal. We need to
-                // peek next char to know. If it is an equal sign then we know
-                // that we need to return an Equal token.
-                if self.peek_char() == '=' {
-                    self.read_char();
-                    literal.push(self.ch);
-                    TokenType::Equal
-                } else {
-                    TokenType::Assign
-                }
-            }
-            '!' => {
-                // Here we don't know yet if it assign or equal. We need to
-                // peek next char to know. If it is an equal sign then we know
-                // that we need to return a NotEqual token.
-                if self.peek_char() == '=' {
-                    self.read_char();
-                    literal.push(self.ch);
-                    TokenType::NotEqual
-                } else {
-                    TokenType::Bang
-                }
-            }
-            _ => {
-                if token.is_alphabetic() {
-                    // read_identifier() returns a slice of the input string
-                    // We return directly because we already did the self.read_char()
-                    // so we don't want to do another one.
-                    let ident = self.read_identifier();
-                    return Token {
-                        token_type: match ident {
-                            "fn" => TokenType::Function,
-                            "let" => TokenType::Let,
-                            "true" => TokenType::True,
-                            "false" => TokenType::False,
-                            "if" => TokenType::If,
-                            "else" => TokenType::Else,
-                            "return" => TokenType::Return,
-                            _ => TokenType::Ident,
-                        },
-                        literal: String::from(ident),
-                    };
-                } else if token.is_ascii_digit() {
-                    // read_number() returns a new String from slice of input
-                    // string. And as above, we return directly because we already
-                    // did the self.read_char().
-                    return Token {
-                        token_type: TokenType::Int,
-                        literal: String::from(self.read_number()),
-                    };
-                } else {
-                    TokenType::Illegal
-                }
-            }
-        };
-
-        self.read_char();
-        Token {
-            token_type,
-            literal,
-        }
     }
 
     // Read the next character and advance our position in the input string.
@@ -151,5 +68,93 @@ impl<'a> Lexer<'a> {
             self.read_char();
         }
         &self.input[pos..self.position]
+    }
+}
+
+impl Iterator for Lexer<'_> {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.skip_whitespace();
+
+        let token = self.ch;
+        let mut literal = token.to_string();
+        let token_type = match token {
+            ';' => TokenType::Semicolon,
+            '(' => TokenType::LParen,
+            ')' => TokenType::RParen,
+            ',' => TokenType::Comma,
+            '+' => TokenType::Plus,
+            '-' => TokenType::Minus,
+            '/' => TokenType::Slash,
+            '*' => TokenType::Asterisk,
+            '<' => TokenType::LT,
+            '>' => TokenType::GT,
+            '{' => TokenType::LBrace,
+            '}' => TokenType::RBrace,
+            '\0' => return None,
+            '=' => {
+                // Here we don't know yet if it assign or equal. We need to
+                // peek next char to know. If it is an equal sign then we know
+                // that we need to return an Equal token.
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    literal.push(self.ch);
+                    TokenType::Equal
+                } else {
+                    TokenType::Assign
+                }
+            }
+            '!' => {
+                // Here we don't know yet if it assign or equal. We need to
+                // peek next char to know. If it is an equal sign then we know
+                // that we need to return a NotEqual token.
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    literal.push(self.ch);
+                    TokenType::NotEqual
+                } else {
+                    TokenType::Bang
+                }
+            }
+            _ => {
+                if token.is_alphabetic() {
+                    // read_identifier() returns a slice of the input string
+                    // We return directly because we already did the self.read_char()
+                    // so we don't want to do another one.
+                    let ident = self.read_identifier();
+                    return Some(Token {
+                        token_type: match ident {
+                            "fn" => TokenType::Function,
+                            "let" => TokenType::Let,
+                            "true" => TokenType::True,
+                            "false" => TokenType::False,
+                            "if" => TokenType::If,
+                            "else" => TokenType::Else,
+                            "return" => TokenType::Return,
+                            _ => TokenType::Ident,
+                        },
+                        literal: String::from(ident),
+                    });
+                } else if token.is_ascii_digit() {
+                    // read_number() returns a new String from slice of input
+                    // string. And as above, we return directly because we already
+                    // did the self.read_char().
+                    return Some(Token {
+                        token_type: TokenType::Int,
+                        literal: String::from(self.read_number()),
+                    });
+                } else {
+                    TokenType::Illegal
+                }
+            }
+        };
+
+        self.read_char();
+
+        Some(Token {
+            token_type,
+            literal,
+        })
     }
 }

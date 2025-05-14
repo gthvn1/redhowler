@@ -1,5 +1,3 @@
-extern crate redhowler;
-
 use redhowler::repl;
 
 fn main() {

@@ -291,7 +291,10 @@ impl<'l> Parser<'l> {
     // Advance the lexer by one token and update the current and peek tokens.
     fn next_token(&mut self) {
         self.cur_token = self.peek_token.clone();
-        self.peek_token = self.lexer.next_token();
+        self.peek_token = self.lexer.next().unwrap_or(Token {
+            token_type: TokenType::EOF,
+            literal: "".to_string(),
+        });
     }
 
     // Check if the current token is of the expected type.

@@ -1,4 +1,4 @@
-use crate::interpreter::{lexer, token};
+use crate::interpreter::lexer;
 use std::io::{self, Write};
 
 pub fn start() {
@@ -20,12 +20,8 @@ pub fn start() {
             break;
         }
 
-        let mut l = lexer::Lexer::new(&input);
-        loop {
-            let tok = l.next_token();
-            if tok.token_type == token::TokenType::EOF {
-                break;
-            }
+        let lex = lexer::Lexer::new(&input);
+        for tok in lex {
             println!("{:?}", tok);
         }
     }
