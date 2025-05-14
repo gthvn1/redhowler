@@ -192,7 +192,6 @@ impl ReturnStatementBuilder {
 }
 
 #[allow(dead_code)]
-
 pub struct ReturnStatement {
     pub token: Token, // The token.RETURN token.
     pub return_value: Box<dyn Expression>,

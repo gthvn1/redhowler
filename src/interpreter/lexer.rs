@@ -123,27 +123,23 @@ impl Iterator for Lexer<'_> {
                     // We return directly because we already did the self.read_char()
                     // so we don't want to do another one.
                     let ident = self.read_identifier();
-                    return Some(Token {
-                        token_type: match ident {
-                            "fn" => TokenType::Function,
-                            "let" => TokenType::Let,
-                            "true" => TokenType::True,
-                            "false" => TokenType::False,
-                            "if" => TokenType::If,
-                            "else" => TokenType::Else,
-                            "return" => TokenType::Return,
-                            _ => TokenType::Ident,
-                        },
-                        literal: String::from(ident),
-                    });
+                    let token_type = match ident {
+                        "fn" => TokenType::Function,
+                        "let" => TokenType::Let,
+                        "true" => TokenType::True,
+                        "false" => TokenType::False,
+                        "if" => TokenType::If,
+                        "else" => TokenType::Else,
+                        "return" => TokenType::Return,
+                        _ => TokenType::Ident,
+                    };
+
+                    return Some(Token::new(token_type, ident));
                 } else if token.is_ascii_digit() {
                     // read_number() returns a new String from slice of input
                     // string. And as above, we return directly because we already
                     // did the self.read_char().
-                    return Some(Token {
-                        token_type: TokenType::Int,
-                        literal: String::from(self.read_number()),
-                    });
+                    return Some(Token::new(TokenType::Int, self.read_number()));
                 } else {
                     TokenType::Illegal
                 }
@@ -152,9 +148,6 @@ impl Iterator for Lexer<'_> {
 
         self.read_char();
 
-        Some(Token {
-            token_type,
-            literal,
-        })
+        Some(Token::new(token_type, &literal))
     }
 }

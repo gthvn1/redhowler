@@ -46,14 +46,8 @@ impl<'l> Parser<'l> {
     pub fn new(lexer: Lexer<'l>) -> Self {
         let mut p = Parser {
             lexer,
-            cur_token: Token {
-                token_type: TokenType::Illegal,
-                literal: String::from("Dummy"),
-            },
-            peek_token: Token {
-                token_type: TokenType::Illegal,
-                literal: String::from("Dummy"),
-            },
+            cur_token: Token::new(TokenType::Illegal, "Dummy"),
+            peek_token: Token::new(TokenType::Illegal, "Dummy"),
             errors: Vec::new(),
             prefix_parse_fns: HashMap::new(),
             infix_parse_fns: HashMap::new(),
@@ -291,10 +285,7 @@ impl<'l> Parser<'l> {
     // Advance the lexer by one token and update the current and peek tokens.
     fn next_token(&mut self) {
         self.cur_token = self.peek_token.clone();
-        self.peek_token = self.lexer.next().unwrap_or(Token {
-            token_type: TokenType::EOF,
-            literal: "".to_string(),
-        });
+        self.peek_token = self.lexer.next().unwrap_or(Token::new(TokenType::EOF, ""));
     }
 
     // Check if the current token is of the expected type.

@@ -7,22 +7,13 @@ fn test_let_statement() {
     let mut p = Program::default();
 
     // Build LetStatement
-    let mut builder = LetStatementBuilder::new(&Token {
-        token_type: TokenType::Let,
-        literal: "let".to_string(),
-    });
+    let mut builder = LetStatementBuilder::new(&Token::new(TokenType::Let, "let"));
 
     // Add name
-    builder.name(Identifier::new(&Token {
-        token_type: TokenType::Ident,
-        literal: "myVar".to_string(),
-    }));
+    builder.name(Identifier::new(&Token::new(TokenType::Ident, "myVar")));
 
     // Add value
-    let id_token = Token {
-        token_type: TokenType::Ident,
-        literal: "anotherVar".to_string(),
-    };
+    let id_token = Token::new(TokenType::Ident, "anotherVar");
     let id = ast::Identifier::new(&id_token);
     builder.value(Some(Box::new(id)));
     let stmt = builder.build();

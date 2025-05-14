@@ -21,52 +21,19 @@ mod tests {
     pub fn test_next_token() {
         let input = "=+(){},;";
 
-        let tests = vec![
-            Token {
-                token_type: TokenType::Assign,
-                literal: String::from("="),
-            },
-            Token {
-                token_type: TokenType::Plus,
-                literal: String::from("+"),
-            },
-            Token {
-                token_type: TokenType::LParen,
-                literal: String::from("("),
-            },
-            Token {
-                token_type: TokenType::RParen,
-                literal: String::from(")"),
-            },
-            Token {
-                token_type: TokenType::LBrace,
-                literal: String::from("{"),
-            },
-            Token {
-                token_type: TokenType::RBrace,
-                literal: String::from("}"),
-            },
-            Token {
-                token_type: TokenType::Comma,
-                literal: String::from(","),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::EOF,
-                literal: String::from("\0"),
-            },
+        let expected = vec![
+            Token::new(TokenType::Assign, "="),
+            Token::new(TokenType::Plus, "+"),
+            Token::new(TokenType::LParen, "("),
+            Token::new(TokenType::RParen, ")"),
+            Token::new(TokenType::LBrace, "{"),
+            Token::new(TokenType::RBrace, "}"),
+            Token::new(TokenType::Comma, ","),
+            Token::new(TokenType::Semicolon, ";"),
         ];
 
-        let mut l = Lexer::new(input);
-
-        for tt in tests {
-            let tok = l.next_token();
-            assert_eq!(tok.token_type, tt.token_type);
-            assert_eq!(tok.literal, tt.literal);
-        }
+        let tokens: Vec<_> = Lexer::new(input).collect();
+        assert_eq!(tokens, expected);
     }
 
     #[test]
@@ -92,310 +59,83 @@ mod tests {
             10 == 10;
             10 != 9;
             ";
-        let tests = vec![
-            Token {
-                token_type: TokenType::Let,
-                literal: String::from("let"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("five"),
-            },
-            Token {
-                token_type: TokenType::Assign,
-                literal: String::from("="),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("5"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Let,
-                literal: String::from("let"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("ten"),
-            },
-            Token {
-                token_type: TokenType::Assign,
-                literal: String::from("="),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Let,
-                literal: String::from("let"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("add"),
-            },
-            Token {
-                token_type: TokenType::Assign,
-                literal: String::from("="),
-            },
-            Token {
-                token_type: TokenType::Function,
-                literal: String::from("fn"),
-            },
-            Token {
-                token_type: TokenType::LParen,
-                literal: String::from("("),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("x"),
-            },
-            Token {
-                token_type: TokenType::Comma,
-                literal: String::from(","),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("y"),
-            },
-            Token {
-                token_type: TokenType::RParen,
-                literal: String::from(")"),
-            },
-            Token {
-                token_type: TokenType::LBrace,
-                literal: String::from("{"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("x"),
-            },
-            Token {
-                token_type: TokenType::Plus,
-                literal: String::from("+"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("y"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::RBrace,
-                literal: String::from("}"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Let,
-                literal: String::from("let"),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("result"),
-            },
-            Token {
-                token_type: TokenType::Assign,
-                literal: String::from("="),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("add"),
-            },
-            Token {
-                token_type: TokenType::LParen,
-                literal: String::from("("),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("five"),
-            },
-            Token {
-                token_type: TokenType::Comma,
-                literal: String::from(","),
-            },
-            Token {
-                token_type: TokenType::Ident,
-                literal: String::from("ten"),
-            },
-            Token {
-                token_type: TokenType::RParen,
-                literal: String::from(")"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Bang,
-                literal: String::from("!"),
-            },
-            Token {
-                token_type: TokenType::Minus,
-                literal: String::from("-"),
-            },
-            Token {
-                token_type: TokenType::Slash,
-                literal: String::from("/"),
-            },
-            Token {
-                token_type: TokenType::Asterisk,
-                literal: String::from("*"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("5"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("5"),
-            },
-            Token {
-                token_type: TokenType::LT,
-                literal: String::from("<"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::GT,
-                literal: String::from(">"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("5"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::If,
-                literal: String::from("if"),
-            },
-            Token {
-                token_type: TokenType::LParen,
-                literal: String::from("("),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("5"),
-            },
-            Token {
-                token_type: TokenType::LT,
-                literal: String::from("<"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::RParen,
-                literal: String::from(")"),
-            },
-            Token {
-                token_type: TokenType::LBrace,
-                literal: String::from("{"),
-            },
-            Token {
-                token_type: TokenType::Return,
-                literal: String::from("return"),
-            },
-            Token {
-                token_type: TokenType::True,
-                literal: String::from("true"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::RBrace,
-                literal: String::from("}"),
-            },
-            Token {
-                token_type: TokenType::Else,
-                literal: String::from("else"),
-            },
-            Token {
-                token_type: TokenType::LBrace,
-                literal: String::from("{"),
-            },
-            Token {
-                token_type: TokenType::Return,
-                literal: String::from("return"),
-            },
-            Token {
-                token_type: TokenType::False,
-                literal: String::from("false"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::RBrace,
-                literal: String::from("}"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::Equal,
-                literal: String::from("=="),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("10"),
-            },
-            Token {
-                token_type: TokenType::NotEqual,
-                literal: String::from("!="),
-            },
-            Token {
-                token_type: TokenType::Int,
-                literal: String::from("9"),
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                literal: String::from(";"),
-            },
-            Token {
-                token_type: TokenType::EOF,
-                literal: String::from("\0"),
-            },
+        let expected = vec![
+            Token::new(TokenType::Let, "let"),
+            Token::new(TokenType::Ident, "five"),
+            Token::new(TokenType::Assign, "="),
+            Token::new(TokenType::Int, "5"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Let, "let"),
+            Token::new(TokenType::Ident, "ten"),
+            Token::new(TokenType::Assign, "="),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Let, "let"),
+            Token::new(TokenType::Ident, "add"),
+            Token::new(TokenType::Assign, "="),
+            Token::new(TokenType::Function, "fn"),
+            Token::new(TokenType::LParen, "("),
+            Token::new(TokenType::Ident, "x"),
+            Token::new(TokenType::Comma, ","),
+            Token::new(TokenType::Ident, "y"),
+            Token::new(TokenType::RParen, ")"),
+            Token::new(TokenType::LBrace, "{"),
+            Token::new(TokenType::Ident, "x"),
+            Token::new(TokenType::Plus, "+"),
+            Token::new(TokenType::Ident, "y"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::RBrace, "}"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Let, "let"),
+            Token::new(TokenType::Ident, "result"),
+            Token::new(TokenType::Assign, "="),
+            Token::new(TokenType::Ident, "add"),
+            Token::new(TokenType::LParen, "("),
+            Token::new(TokenType::Ident, "five"),
+            Token::new(TokenType::Comma, ","),
+            Token::new(TokenType::Ident, "ten"),
+            Token::new(TokenType::RParen, ")"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Bang, "!"),
+            Token::new(TokenType::Minus, "-"),
+            Token::new(TokenType::Slash, "/"),
+            Token::new(TokenType::Asterisk, "*"),
+            Token::new(TokenType::Int, "5"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Int, "5"),
+            Token::new(TokenType::LT, "<"),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::GT, ">"),
+            Token::new(TokenType::Int, "5"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::If, "if"),
+            Token::new(TokenType::LParen, "("),
+            Token::new(TokenType::Int, "5"),
+            Token::new(TokenType::LT, "<"),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::RParen, ")"),
+            Token::new(TokenType::LBrace, "{"),
+            Token::new(TokenType::Return, "return"),
+            Token::new(TokenType::True, "true"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::RBrace, "}"),
+            Token::new(TokenType::Else, "else"),
+            Token::new(TokenType::LBrace, "{"),
+            Token::new(TokenType::Return, "return"),
+            Token::new(TokenType::False, "false"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::RBrace, "}"),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::Equal, "=="),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::Semicolon, ";"),
+            Token::new(TokenType::Int, "10"),
+            Token::new(TokenType::NotEqual, "!="),
+            Token::new(TokenType::Int, "9"),
+            Token::new(TokenType::Semicolon, ";"),
         ];
 
-        let mut l = Lexer::new(&input);
-        for tt in tests {
-            let tok = l.next_token();
-            assert_eq!(tok.literal, tt.literal);
-            assert_eq!(tok.token_type, tt.token_type);
-        }
+        let tokens: Vec<_> = Lexer::new(input).collect();
+        assert_eq!(tokens, expected);
     }
 }

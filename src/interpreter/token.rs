@@ -48,6 +48,13 @@ pub struct Token {
 }
 
 impl Token {
+    pub fn new(token_type: TokenType, literal: &str) -> Self {
+        Self {
+            token_type,
+            literal: literal.to_string(),
+        }
+    }
+
     pub fn literal(&self) -> String {
         self.literal.clone()
     }
