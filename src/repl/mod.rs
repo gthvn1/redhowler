@@ -34,8 +34,7 @@ pub fn start() {
             }
             Err(e) => {
                 eprintln!("Error reading line: {}", e);
-                println!("May your trip be as enjoyable as finding extra bananas at the bottom of the bag!");
-                break;
+                println!("Same player shoot again");
             }
         }
     }
