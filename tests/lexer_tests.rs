@@ -18,7 +18,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_next_token() {
+    pub fn test_simple_tokens() {
         let input = "=+(){},;";
 
         let expected = vec![
@@ -37,7 +37,7 @@ mod tests {
     }
 
     #[test]
-    fn test_next_token_source() {
+    fn test_source_code() {
         let input = "
             let five = 5;
             let ten = 10;
