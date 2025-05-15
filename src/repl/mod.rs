@@ -17,9 +17,7 @@ pub fn start() {
         print!(">> ");
         stdout.flush().expect("Failed to flush stdout");
 
-        let bytes_read = handle.read_line(&mut input);
-
-        match bytes_read {
+        match handle.read_line(&mut input) {
             Ok(0) => {
                 // 0 bytes means EOF (Ctrl+D)
                 println!("detected Ctrl+D, exited.");
