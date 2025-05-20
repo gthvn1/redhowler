@@ -66,8 +66,8 @@ mod tests {
         ];
 
         for tt in tests.iter() {
-            let l = Lexer::new(tt.input);
-            let mut p = Parser::new(l);
+            let l = Lexer::from_str(tt.input);
+            let mut p = Parser::from_lexer(l);
 
             let program = p.parse_program();
 
@@ -141,8 +141,8 @@ mod tests {
         ];
 
         for tt in infix_tests.iter() {
-            let l = Lexer::new(tt.input);
-            let mut p = Parser::new(l);
+            let l = Lexer::from_str(tt.input);
+            let mut p = Parser::from_lexer(l);
 
             let program = p.parse_program();
 
@@ -203,8 +203,8 @@ mod tests {
         ];
 
         prefix_tests.iter().for_each(|tt| {
-            let l = Lexer::new(tt.input);
-            let mut p = Parser::new(l);
+            let l = Lexer::from_str(tt.input);
+            let mut p = Parser::from_lexer(l);
 
             let program = p.parse_program();
 
@@ -237,8 +237,8 @@ mod tests {
     fn test_integer_literal() {
         let input = "5;";
 
-        let l = Lexer::new(input);
-        let mut p = Parser::new(l);
+        let l = Lexer::from_str(input);
+        let mut p = Parser::from_lexer(l);
 
         let program = p.parse_program();
 
@@ -257,8 +257,8 @@ mod tests {
     fn test_identifier_expression() {
         let input = "foobar;";
 
-        let l = Lexer::new(input);
-        let mut p = Parser::new(l);
+        let l = Lexer::from_str(input);
+        let mut p = Parser::from_lexer(l);
 
         let program = p.parse_program();
 
@@ -281,8 +281,8 @@ mod tests {
             return 993322;
         ";
 
-        let l = Lexer::new(input);
-        let mut p = Parser::new(l);
+        let l = Lexer::from_str(input);
+        let mut p = Parser::from_lexer(l);
 
         let program = p.parse_program();
 
@@ -302,8 +302,8 @@ mod tests {
             let foobar = 838383;
         ";
 
-        let l = Lexer::new(input);
-        let mut p = Parser::new(l);
+        let l = Lexer::from_str(input);
+        let mut p = Parser::from_lexer(l);
 
         let program = p.parse_program();
 

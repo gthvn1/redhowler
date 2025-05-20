@@ -32,7 +32,7 @@ mod tests {
             Token::new(TokenType::Semicolon, ";"),
         ];
 
-        let tokens: Vec<_> = Lexer::new(input).collect();
+        let tokens: Vec<_> = Lexer::from_str(input).collect();
         assert_eq!(tokens, expected);
     }
 
@@ -135,7 +135,7 @@ mod tests {
             Token::new(TokenType::Semicolon, ";"),
         ];
 
-        let tokens: Vec<_> = Lexer::new(input).collect();
+        let tokens: Vec<_> = Lexer::from_str(input).collect();
         assert_eq!(tokens, expected);
     }
 }

@@ -43,7 +43,7 @@ pub struct Parser<'l> {
 // completely ok.
 #[allow(dead_code)]
 impl<'l> Parser<'l> {
-    pub fn new(lexer: Lexer<'l>) -> Self {
+    pub fn from_lexer(lexer: Lexer<'l>) -> Self {
         let mut p = Parser {
             lexer,
             cur_token: Token::new(TokenType::Illegal, "Dummy"),

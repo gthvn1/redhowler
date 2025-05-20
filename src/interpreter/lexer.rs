@@ -8,7 +8,7 @@ pub struct Lexer<'a> {
 }
 
 impl Lexer<'_> {
-    pub fn new(input: &str) -> Lexer {
+    pub fn from_str(input: &str) -> Lexer {
         let mut l = Lexer {
             input,
             position: 0,

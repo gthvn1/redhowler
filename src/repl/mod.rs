@@ -1,4 +1,4 @@
-use crate::interpreter::lexer;
+use crate::interpreter::lexer::Lexer;
 use std::io::{self, BufRead, Write};
 
 pub fn start() {
@@ -25,7 +25,7 @@ pub fn start() {
                 break;
             }
             Ok(_) => {
-                let lex = lexer::Lexer::new(&input);
+                let lex = Lexer::from_str(&input);
                 for tok in lex {
                     println!("{:?}", tok);
                 }
